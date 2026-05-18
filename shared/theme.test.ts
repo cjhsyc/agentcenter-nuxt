@@ -6,13 +6,14 @@ describe("theme", () => {
     expect(THEME_COOKIE_NAME).toBe("theme")
   })
 
-  it("valid themes are exactly ivory and dark", () => {
-    expect([...VALID_THEMES].sort()).toEqual(["dark", "ivory"])
+  it("valid themes are exactly ivory, dark, and mono", () => {
+    expect([...VALID_THEMES].sort()).toEqual(["dark", "ivory", "mono"])
   })
 
   it.each([
     ["ivory", true],
     ["dark", true],
+    ["mono", true],
     ["system", false],
     ["", false],
     [null, false],

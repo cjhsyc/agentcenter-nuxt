@@ -10,17 +10,15 @@ export function useTheme() {
 
   if (!isValidTheme(cookie.value)) cookie.value = "ivory"
 
-  const htmlClass = computed(() => (cookie.value === "dark" ? "dark" : ""))
+  const htmlClass = computed(() =>
+    cookie.value === "dark" ? "dark" : cookie.value === "mono" ? "mono" : "",
+  )
 
   useHead({ htmlAttrs: { class: htmlClass } })
-
-  function toggle() {
-    cookie.value = cookie.value === "dark" ? "ivory" : "dark"
-  }
 
   function set(next: Theme) {
     cookie.value = next
   }
 
-  return { theme: cookie, toggle, set }
+  return { theme: cookie, set }
 }
