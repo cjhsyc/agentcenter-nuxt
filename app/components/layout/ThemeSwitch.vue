@@ -62,60 +62,63 @@ function pick(next: Theme) {
       class="w-60 p-1.5 rounded-xl shadow-lg"
     >
       <div
+        id="theme-switch-label"
         class="px-2.5 pt-1.5 pb-2 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-(--color-ink-muted)"
       >
         {{ t("nav.themeLabel") }}
       </div>
-      <button
-        v-for="opt in options"
-        :key="opt.key"
-        type="button"
-        role="option"
-        :aria-selected="theme === opt.key"
-        class="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left transition-colors hover:bg-(--color-sidebar) data-[active=true]:bg-(--color-sidebar) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
-        :data-active="theme === opt.key"
-        @click="pick(opt.key)"
-      >
-        <span
-          class="relative shrink-0 w-9 h-[26px] rounded-md overflow-hidden border border-(--color-border)"
-          :style="{ background: opt.paper }"
-          aria-hidden="true"
+      <div role="listbox" aria-labelledby="theme-switch-label">
+        <button
+          v-for="opt in options"
+          :key="opt.key"
+          type="button"
+          role="option"
+          :aria-selected="theme === opt.key"
+          class="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left transition-colors hover:bg-(--color-sidebar) data-[active=true]:bg-(--color-sidebar) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
+          :data-active="theme === opt.key"
+          @click="pick(opt.key)"
         >
           <span
-            class="absolute left-[3px] right-[3px] top-[3px] h-1 rounded-[1.5px] opacity-90"
-            :style="{ background: opt.ink }"
-          />
-          <span
-            class="absolute left-[3px] top-[10px] w-[11px] h-1 rounded-[1.5px]"
-            :style="{ background: opt.accent }"
-          />
-          <span
-            class="absolute left-[3px] right-2 top-[17px] h-[2.5px] rounded-[1px] opacity-[0.28]"
-            :style="{ background: opt.ink }"
-          />
-          <span
-            class="absolute left-[3px] right-[13px] top-[21px] h-[2.5px] rounded-[1px] opacity-[0.28]"
-            :style="{ background: opt.ink }"
-          />
-        </span>
-        <span class="flex-1 min-w-0">
-          <span
-            class="block text-[13px] tracking-tight font-serif"
-            :class="theme === opt.key ? 'font-semibold' : 'font-medium'"
+            class="relative shrink-0 w-9 h-[26px] rounded-md overflow-hidden border border-(--color-border)"
+            :style="{ background: opt.paper }"
+            aria-hidden="true"
           >
-            {{ t(opt.labelKey) }}
+            <span
+              class="absolute left-[3px] right-[3px] top-[3px] h-1 rounded-[1.5px] opacity-90"
+              :style="{ background: opt.ink }"
+            />
+            <span
+              class="absolute left-[3px] top-[10px] w-[11px] h-1 rounded-[1.5px]"
+              :style="{ background: opt.accent }"
+            />
+            <span
+              class="absolute left-[3px] right-2 top-[17px] h-[2.5px] rounded-[1px] opacity-[0.28]"
+              :style="{ background: opt.ink }"
+            />
+            <span
+              class="absolute left-[3px] right-[13px] top-[21px] h-[2.5px] rounded-[1px] opacity-[0.28]"
+              :style="{ background: opt.ink }"
+            />
           </span>
-          <span class="block text-[11px] text-(--color-ink-muted) mt-px">
-            {{ t(opt.descKey) }}
+          <span class="flex-1 min-w-0">
+            <span
+              class="block text-[13px] tracking-tight font-serif"
+              :class="theme === opt.key ? 'font-semibold' : 'font-medium'"
+            >
+              {{ t(opt.labelKey) }}
+            </span>
+            <span class="block text-[11px] text-(--color-ink-muted) mt-px">
+              {{ t(opt.descKey) }}
+            </span>
           </span>
-        </span>
-        <Check
-          v-if="theme === opt.key"
-          :size="13"
-          class="text-(--color-accent) shrink-0"
-          aria-hidden="true"
-        />
-      </button>
+          <Check
+            v-if="theme === opt.key"
+            :size="13"
+            class="text-(--color-accent) shrink-0"
+            aria-hidden="true"
+          />
+        </button>
+      </div>
     </PopoverContent>
   </Popover>
 </template>
