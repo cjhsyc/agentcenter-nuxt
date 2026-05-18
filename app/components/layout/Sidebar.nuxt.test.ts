@@ -16,12 +16,22 @@ const mountOpts = {
 }
 
 describe("Sidebar", () => {
-  it("renders Browse + Categories + Collections section headers", async () => {
+  it("renders Browse and Categories section headers as non-clickable labels", async () => {
     const wrapper = await mountSuspended(Sidebar, mountOpts)
     const html = wrapper.html().toLowerCase()
     expect(html).toContain("browse")
     expect(html).toContain("categor")
-    expect(html).toContain("collection")
+    // Section headers are <h2>, not <button> — sections are always expanded.
+    const h2s = wrapper.findAll("h2")
+    expect(h2s.length).toBe(2)
+  })
+
+  it("no longer renders the Collections placeholder section", async () => {
+    const wrapper = await mountSuspended(Sidebar, mountOpts)
+    const html = wrapper.html().toLowerCase()
+    expect(html).not.toContain("collection")
+    expect(html).not.toContain("my tools")
+    expect(html).not.toContain("new group")
   })
 
   it("does not render a primary-nav 'Explore' section (that moved to TopBar)", async () => {
