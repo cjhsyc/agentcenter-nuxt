@@ -53,7 +53,10 @@ function buildHref(updates: Record<string, string | null>): string {
 </script>
 
 <template>
-  <div v-if="!collapsed" class="min-w-[200px] flex-1 overflow-y-auto px-5 py-3 text-(--color-ink)">
+  <div
+    v-if="!collapsed"
+    class="min-w-[200px] flex-1 overflow-y-auto px-5 py-3 text-(--color-ink) [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+  >
     <!-- Browse -->
     <h2 class="px-2 pb-1.5 font-serif text-[12px] italic tracking-wide text-(--color-ink-muted)">
       {{ t("sidebar.browse") }}
