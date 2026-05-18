@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check, Contrast, Moon, Sun } from "lucide-vue-next"
+import { Check, Moon, Sun } from "lucide-vue-next"
 import type { Theme } from "~~/shared/types"
 
 const { t } = useI18n()
@@ -11,19 +11,19 @@ interface ThemeOption {
   key: Theme
   labelKey: string
   descKey: string
-  icon: typeof Sun
   paper: string
   ink: string
   accent: string
 }
 
 const options: ThemeOption[] = [
-  { key: "ivory", labelKey: "nav.themeIvory", descKey: "nav.themeIvoryDesc", icon: Sun,      paper: "#f6f1e8", ink: "#1a1a1e", accent: "#c46a3a" },
-  { key: "dark",  labelKey: "nav.themeDark",  descKey: "nav.themeDarkDesc",  icon: Moon,     paper: "#1a1a1e", ink: "#e8eaed", accent: "#8da4ef" },
-  { key: "mono",  labelKey: "nav.themeMono",  descKey: "nav.themeMonoDesc",  icon: Contrast, paper: "#f6f6f6", ink: "#0f0f0f", accent: "#0f0f0f" },
+  { key: "ivory", labelKey: "nav.themeIvory", descKey: "nav.themeIvoryDesc", paper: "#f6f1e8", ink: "#1a1a1e", accent: "#c46a3a" },
+  { key: "dark",  labelKey: "nav.themeDark",  descKey: "nav.themeDarkDesc",  paper: "#1a1a1e", ink: "#e8eaed", accent: "#8da4ef" },
+  { key: "mono",  labelKey: "nav.themeMono",  descKey: "nav.themeMonoDesc",  paper: "#f6f6f6", ink: "#0f0f0f", accent: "#0f0f0f" },
 ]
 
 const current = computed(() => options.find(o => o.key === theme.value) ?? options[0]!)
+const currentLabel = computed(() => t(current.value.labelKey))
 
 function pick(next: Theme) {
   set(next)
@@ -38,9 +38,22 @@ function pick(next: Theme) {
         type="button"
         class="size-8 rounded-full inline-flex items-center justify-center border border-transparent hover:bg-(--color-sidebar) data-[state=open]:border-(--color-border) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
         :aria-label="t('nav.themeLabel')"
-        :title="`${t('nav.themeLabel')}: ${t(current.labelKey)}`"
+        :title="`${t('nav.themeLabel')}: ${currentLabel}`"
       >
-        <component :is="current.icon" :size="16" aria-hidden="true" />
+        <Sun v-if="theme === 'ivory'" :size="16" aria-hidden="true" />
+        <Moon v-else-if="theme === 'dark'" :size="16" aria-hidden="true" />
+        <svg
+          v-else
+          data-theme-icon="mono"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.4" />
+          <path d="M8 1.8a6.2 6.2 0 010 12.4z" fill="currentColor" />
+        </svg>
       </button>
     </PopoverTrigger>
     <PopoverContent

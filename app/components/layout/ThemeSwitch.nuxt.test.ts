@@ -12,7 +12,7 @@ describe("ThemeSwitch", () => {
     const wrapper = await mountSuspended(ThemeSwitch)
     expect(wrapper.find("svg.lucide-sun").exists()).toBe(true)
     expect(wrapper.find("svg.lucide-moon").exists()).toBe(false)
-    expect(wrapper.find("svg.lucide-contrast").exists()).toBe(false)
+    expect(wrapper.find('svg[data-theme-icon="mono"]').exists()).toBe(false)
   })
 
   it("trigger shows the Moon icon when theme is dark", async () => {
@@ -22,11 +22,16 @@ describe("ThemeSwitch", () => {
     expect(wrapper.find("svg.lucide-sun").exists()).toBe(false)
   })
 
-  it("trigger shows the Contrast icon when theme is mono", async () => {
+  it("trigger shows the half-filled contrast disc when theme is mono", async () => {
     document.cookie = "theme=mono; path=/"
     const wrapper = await mountSuspended(ThemeSwitch)
-    expect(wrapper.find("svg.lucide-contrast").exists()).toBe(true)
+    const monoIcon = wrapper.find('svg[data-theme-icon="mono"]')
+    expect(monoIcon.exists()).toBe(true)
+    // disc outline + half-filled path
+    expect(monoIcon.find("circle").exists()).toBe(true)
+    expect(monoIcon.find("path").exists()).toBe(true)
     expect(wrapper.find("svg.lucide-sun").exists()).toBe(false)
+    expect(wrapper.find("svg.lucide-moon").exists()).toBe(false)
   })
 
   it("trigger exposes the Theme aria-label and a title with the current theme", async () => {
