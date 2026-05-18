@@ -1,9 +1,8 @@
 <script setup lang="ts">
 const { t } = useI18n()
-// The MCP Panorama page renders its own LayerSidebar (which depends on
-// page state). The global aside ships collapsed by default so LayerSidebar
-// owns the gutter, but the TopBar menu toggle still opens the global nav
-// on demand — primary nav stays reachable from this page.
+// The MCP Panorama page renders its own LayerSidebar inside <main>.
+// This layout omits the global aside slot so the page-owned sidebar
+// owns the gutter; primary nav stays reachable through the TopBar.
 const sidebarCollapsed = ref(true)
 function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value
@@ -26,18 +25,8 @@ function toggleSidebar() {
       <TopBar :collapsed="sidebarCollapsed" @toggle-sidebar="toggleSidebar" />
     </header>
 
-    <div class="flex flex-1 min-h-0">
-      <aside
-        class="border-r border-(--color-border) bg-(--color-sidebar) overflow-hidden flex flex-col transition-[width] duration-200"
-        :class="sidebarCollapsed ? 'w-0' : 'w-[240px]'"
-        role="navigation"
-      >
-        <Sidebar :collapsed="sidebarCollapsed" />
-      </aside>
-
-      <main id="main-content" tabindex="-1" class="flex flex-1 min-h-0 focus:outline-none">
-        <slot />
-      </main>
-    </div>
+    <main id="main-content" tabindex="-1" class="flex flex-1 min-h-0 focus:outline-none">
+      <slot />
+    </main>
   </div>
 </template>

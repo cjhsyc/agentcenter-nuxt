@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import {
-  BookOpen,
-  Boxes,
   ChevronDown,
   ChevronRight,
   Command,
-  Compass,
   Folder,
   Globe2,
-  Map,
   Plug,
   Plus,
-  Upload,
   Zap,
 } from "lucide-vue-next"
+import { FUNC_CAT_COLORS, FUNC_TAXONOMY } from "~~/shared/taxonomy"
 import type { Component } from "vue"
 
 defineProps<{ collapsed: boolean }>()
@@ -22,10 +18,9 @@ const { t } = useI18n()
 const route = useRoute()
 const localePath = useLocalePath()
 
-type Category = "all" | "skills" | "mcp" | "slash" | "plugins"
+type Category = "skills" | "mcp" | "slash" | "plugins"
 
 const BROWSE_ITEMS: { key: Category; labelKey: string; Icon: Component }[] = [
-  { key: "all", labelKey: "sidebar.allExtensions", Icon: Boxes },
   { key: "skills", labelKey: "sidebar.skills", Icon: Zap },
   { key: "mcp", labelKey: "sidebar.mcpServers", Icon: Globe2 },
   { key: "slash", labelKey: "sidebar.slashCommands", Icon: Command },
@@ -37,25 +32,33 @@ const COLLECTION_PLACEHOLDERS = [
   { id: "p2", name: "Reviewed" },
 ]
 
-const activeCategory = computed<Category>(() => {
+const activeCategory = computed<Category | null>(() => {
   const raw = route.query.category
   if (typeof raw === "string" && ["skills", "mcp", "slash", "plugins"].includes(raw)) {
     return raw as Category
   }
-  return "all"
+  return null
 })
 
-type NavKey = "extensions" | "mcp-panorama" | "publish" | "docs"
-
-const PRIMARY_NAV: { key: NavKey; to: string; labelKey: string; Icon: Component; disabled?: boolean }[] = [
-  { key: "extensions", to: "/extensions", labelKey: "nav.explore", Icon: Compass },
-  { key: "mcp-panorama", to: "/mcp-panorama", labelKey: "nav.mcpPanorama", Icon: Map },
-  { key: "publish", to: "/publish", labelKey: "nav.publish", Icon: Upload },
-  { key: "docs", to: "", labelKey: "nav.docs", Icon: BookOpen, disabled: true },
-]
+const activeFuncCat = computed(() => (typeof route.query.funcCat === "string" ? route.query.funcCat : null))
+const activeSubCat = computed(() => (typeof route.query.subCat === "string" ? route.query.subCat : null))
+const activeL2 = computed(() => (typeof route.query.l2 === "string" ? route.query.l2 : null))
 
 const expansion = reactive({
-  sections: { explore: true, browse: true, collections: false },
+  sections: { browse: true, categories: true, collections: false },
+  funcCats: {} as Record<string, boolean>,
+  l1: {} as Record<string, boolean>,
+})
+
+if (activeFuncCat.value) expansion.funcCats[activeFuncCat.value] = true
+else expansion.funcCats.workTask = true
+if (activeSubCat.value) expansion.l1[activeSubCat.value] = true
+
+watch(activeFuncCat, (next) => {
+  if (next) expansion.funcCats[next] = true
+})
+watch(activeSubCat, (next) => {
+  if (next) expansion.l1[next] = true
 })
 
 function buildHref(updates: Record<string, string | null>): string {
@@ -72,55 +75,19 @@ function buildHref(updates: Record<string, string | null>): string {
   return qs ? `${path}?${qs}` : path
 }
 
-function toggleSection(key: "explore" | "browse" | "collections") {
+function toggleSection(key: "browse" | "categories" | "collections") {
   expansion.sections[key] = !expansion.sections[key]
+}
+function toggleFuncCat(key: string) {
+  expansion.funcCats[key] = !expansion.funcCats[key]
+}
+function toggleL1(key: string) {
+  expansion.l1[key] = !expansion.l1[key]
 }
 </script>
 
 <template>
   <div v-if="!collapsed" class="min-w-[200px] flex-1 overflow-y-auto p-3 text-(--color-ink)">
-    <!-- Primary nav section -->
-    <div class="mb-1">
-      <button
-        type="button"
-        class="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-[11px] font-bold tracking-wider uppercase text-(--color-ink-muted) hover:text-(--color-ink)"
-        :aria-expanded="expansion.sections.explore"
-        @click="toggleSection('explore')"
-      >
-        {{ t("sidebar.explore") }}
-        <ChevronDown v-if="expansion.sections.explore" :size="14" aria-hidden="true" />
-        <ChevronRight v-else :size="14" aria-hidden="true" />
-      </button>
-      <nav
-        v-if="expansion.sections.explore"
-        class="mt-0.5 flex flex-col gap-px"
-        :aria-label="t('nav.explore')"
-      >
-        <template v-for="item in PRIMARY_NAV" :key="item.key">
-          <span
-            v-if="item.disabled"
-            class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] font-medium text-(--color-ink-muted) cursor-not-allowed"
-            :title="t('nav.comingSoon')"
-            aria-disabled="true"
-          >
-            <component :is="item.Icon" :size="14" class="shrink-0" />
-            <span class="flex-1 truncate">{{ t(item.labelKey) }}</span>
-          </span>
-          <NuxtLink
-            v-else
-            :to="localePath(item.to)"
-            class="flex w-full items-center gap-2.5 rounded-md border-l-2 border-transparent px-2 py-1.5 text-[13px] font-medium text-(--color-ink) transition hover:bg-(--color-sidebar)"
-            active-class="border-l-(--color-ink) bg-(--color-sidebar)/60 font-semibold"
-          >
-            <component :is="item.Icon" :size="14" class="shrink-0" />
-            <span class="flex-1 truncate">{{ t(item.labelKey) }}</span>
-          </NuxtLink>
-        </template>
-      </nav>
-    </div>
-
-    <div class="bg-(--color-border) mx-1 my-3 h-px" />
-
     <!-- Browse section -->
     <div class="mb-1">
       <button
@@ -137,13 +104,95 @@ function toggleSection(key: "explore" | "browse" | "collections") {
         <NuxtLink
           v-for="item in BROWSE_ITEMS"
           :key="item.key"
-          :to="buildHref({ category: item.key === activeCategory ? null : (item.key === 'all' ? null : item.key) })"
+          :to="buildHref({ category: item.key === activeCategory ? null : item.key })"
           class="flex w-full items-center gap-2.5 rounded-md border-l-2 px-2 py-1.5 text-[13px] font-medium text-(--color-ink) transition hover:bg-(--color-sidebar)"
           :class="activeCategory === item.key ? 'border-l-(--color-ink) bg-(--color-sidebar)/60 font-semibold' : 'border-transparent'"
         >
           <component :is="item.Icon" :size="14" class="shrink-0" />
           <span class="flex-1 truncate">{{ t(item.labelKey) }}</span>
         </NuxtLink>
+      </div>
+    </div>
+
+    <div class="bg-(--color-border) mx-1 my-3 h-px" />
+
+    <!-- Function types (Categories) section -->
+    <div class="mb-1">
+      <button
+        type="button"
+        class="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-[11px] font-bold tracking-wider uppercase text-(--color-ink-muted) hover:text-(--color-ink)"
+        :aria-expanded="expansion.sections.categories"
+        @click="toggleSection('categories')"
+      >
+        {{ t("sidebar.categories") }}
+        <ChevronDown v-if="expansion.sections.categories" :size="14" aria-hidden="true" />
+        <ChevronRight v-else :size="14" aria-hidden="true" />
+      </button>
+      <div v-if="expansion.sections.categories" class="mt-0.5 flex flex-col gap-px">
+        <div v-for="cat in FUNC_TAXONOMY" :key="cat.key">
+          <div class="flex items-center">
+            <NuxtLink
+              :to="buildHref({ funcCat: activeFuncCat === cat.key && !activeSubCat && !activeL2 ? null : cat.key, subCat: null, l2: null })"
+              class="flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] font-semibold transition hover:bg-(--color-sidebar)"
+              :class="activeFuncCat === cat.key && !activeSubCat && !activeL2 ? 'bg-(--color-sidebar)/60 text-(--color-ink)' : 'text-(--color-ink)'"
+            >
+              <span class="size-[7px] shrink-0 rounded-sm" :style="{ background: FUNC_CAT_COLORS[cat.key] }" />
+              <span class="flex-1">{{ t(`taxonomy.funcCat.${cat.key}`) }}</span>
+            </NuxtLink>
+            <button
+              type="button"
+              class="text-(--color-ink-muted) hover:text-(--color-ink) rounded p-1 transition-colors"
+              :aria-label="`${expansion.funcCats[cat.key] ? t('filters.dept.collapse') : t('filters.dept.expand')} ${t(`taxonomy.funcCat.${cat.key}`)}`"
+              :aria-expanded="expansion.funcCats[cat.key] ?? false"
+              @click="toggleFuncCat(cat.key)"
+            >
+              <ChevronDown v-if="expansion.funcCats[cat.key]" :size="12" aria-hidden="true" />
+              <ChevronRight v-else :size="12" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div v-if="expansion.funcCats[cat.key]">
+            <div v-for="l1 in cat.l1" :key="l1.key" class="ml-2">
+              <div class="flex items-center">
+                <NuxtLink
+                  :to="buildHref({ funcCat: cat.key, subCat: activeSubCat === l1.key ? null : l1.key, l2: null })"
+                  class="flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12.5px] font-medium hover:bg-(--color-sidebar)"
+                  :class="activeSubCat === l1.key && !activeL2 ? 'bg-(--color-sidebar)/60 text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
+                >
+                  <span
+                    class="w-[1.5px] shrink-0 self-stretch rounded"
+                    :style="{ background: FUNC_CAT_COLORS[cat.key], opacity: activeSubCat === l1.key && !activeL2 ? 1 : 0.35 }"
+                  />
+                  <span class="flex-1">{{ t(`taxonomy.l1.${l1.key}`) }}</span>
+                </NuxtLink>
+                <button
+                  v-if="l1.l2.length > 0"
+                  type="button"
+                  class="text-(--color-ink-muted) hover:text-(--color-ink) rounded p-1"
+                  :aria-label="`${expansion.l1[l1.key] ? t('filters.dept.collapse') : t('filters.dept.expand')} ${t(`taxonomy.l1.${l1.key}`)}`"
+                  :aria-expanded="expansion.l1[l1.key] ?? false"
+                  @click="toggleL1(l1.key)"
+                >
+                  <ChevronDown v-if="expansion.l1[l1.key]" :size="11" aria-hidden="true" />
+                  <ChevronRight v-else :size="11" aria-hidden="true" />
+                </button>
+              </div>
+
+              <div v-if="expansion.l1[l1.key]">
+                <NuxtLink
+                  v-for="l2key in l1.l2"
+                  :key="l2key"
+                  :to="buildHref({ funcCat: cat.key, subCat: l1.key, l2: activeL2 === l2key ? null : l2key })"
+                  class="flex w-full items-center gap-1.5 rounded-md py-1 pr-2 pl-6 text-left text-[12px] hover:bg-(--color-sidebar)"
+                  :class="activeL2 === l2key ? 'bg-(--color-sidebar)/60 text-(--color-ink) font-semibold' : 'text-(--color-ink)/85'"
+                >
+                  <span class="bg-(--color-ink-muted) size-[3px] shrink-0 rounded-full" />
+                  {{ t(`taxonomy.l2.${l2key}`) }}
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

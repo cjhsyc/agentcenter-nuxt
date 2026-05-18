@@ -16,43 +16,40 @@ const mountOpts = {
 }
 
 describe("Sidebar", () => {
-  it("renders Explore + Browse + Collections section headers", async () => {
+  it("renders Browse + Categories + Collections section headers", async () => {
     const wrapper = await mountSuspended(Sidebar, mountOpts)
     const html = wrapper.html().toLowerCase()
-    expect(html).toContain("explore")
     expect(html).toContain("browse")
+    expect(html).toContain("categor")
     expect(html).toContain("collection")
   })
 
-  it("no longer renders the functional taxonomy tree (moved to filter row)", async () => {
+  it("does not render a primary-nav 'Explore' section (that moved to TopBar)", async () => {
+    const wrapper = await mountSuspended(Sidebar, mountOpts)
+    // No top-of-sidebar "EXPLORE" header; primary nav lives in TopBar.
+    expect(wrapper.html()).not.toMatch(/sidebar\.explore/)
+  })
+
+  it("Browse links target /extensions (one per type, no 'All Extensions' item)", async () => {
+    const wrapper = await mountSuspended(Sidebar, mountOpts)
+    const browseLinks = wrapper
+      .findAll("a")
+      .filter((a) => /[?&]category=/.test(a.attributes("href") ?? ""))
+    // Exactly 4 type pills: skills / mcp / slash / plugins. No "All" item.
+    expect(browseLinks.length).toBe(4)
+  })
+
+  it("renders the function-types tree with default-expanded workTask", async () => {
     const wrapper = await mountSuspended(Sidebar, mountOpts)
     const html = wrapper.html().toLowerCase()
-    expect(html).not.toContain("system design")
-    expect(html).not.toContain("network protocols")
-    expect(html).not.toContain("work task")
+    expect(html).toContain("work task")
+    // workTask's first L1 row should be visible after default expansion.
+    expect(html).toContain("system design")
   })
 
-  it("renders primary nav links to Extensions, MCP Panorama, and Publish", async () => {
+  it("does not expand sibling funcCats by default (no 'Network Protocols' visible)", async () => {
     const wrapper = await mountSuspended(Sidebar, mountOpts)
-    const hrefs = wrapper.findAll("a").map((a) => a.attributes("href") ?? "")
-    expect(hrefs.some((h) => h.endsWith("/extensions"))).toBe(true)
-    expect(hrefs.some((h) => h.includes("/mcp-panorama"))).toBe(true)
-    expect(hrefs.some((h) => h.includes("/publish"))).toBe(true)
-  })
-
-  it("renders the Docs item as a disabled placeholder, not a link", async () => {
-    const wrapper = await mountSuspended(Sidebar, mountOpts)
-    const disabled = wrapper.findAll("[aria-disabled='true']")
-    expect(disabled.length).toBeGreaterThan(0)
-    expect(disabled.some((el) => el.text().toLowerCase().includes("docs"))).toBe(true)
-  })
-
-  it("renders at least 5 browse links targeting /extensions", async () => {
-    const wrapper = await mountSuspended(Sidebar, mountOpts)
-    const extLinks = wrapper
-      .findAll("a")
-      .filter((a) => (a.attributes("href") ?? "").includes("/extensions"))
-    expect(extLinks.length).toBeGreaterThanOrEqual(5)
+    expect(wrapper.html().toLowerCase()).not.toContain("network protocols")
   })
 
   it("collapsed prop hides the inner content", async () => {
@@ -62,5 +59,4 @@ describe("Sidebar", () => {
     })
     expect(wrapper.findAll("a").length).toBe(0)
   })
-
 })
