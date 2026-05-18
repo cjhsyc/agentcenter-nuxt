@@ -68,6 +68,37 @@ function onSubmit() {
       >
     </form>
 
+    <nav class="hidden md:flex items-center gap-1 text-sm" :aria-label="t('nav.explore')">
+      <NuxtLink
+        :to="localePath('/extensions')"
+        class="px-3 py-1.5 rounded text-(--color-ink-muted) hover:text-(--color-ink) hover:bg-(--color-sidebar)"
+        active-class="text-(--color-ink) font-semibold bg-(--color-sidebar)/60"
+      >
+        {{ t("nav.explore") }}
+      </NuxtLink>
+      <NuxtLink
+        :to="localePath('/mcp-panorama')"
+        class="px-3 py-1.5 rounded text-(--color-ink-muted) hover:text-(--color-ink) hover:bg-(--color-sidebar)"
+        active-class="text-(--color-ink) font-semibold bg-(--color-sidebar)/60"
+      >
+        {{ t("nav.mcpPanorama") }}
+      </NuxtLink>
+      <NuxtLink
+        :to="localePath('/publish')"
+        class="px-3 py-1.5 rounded text-(--color-ink-muted) hover:text-(--color-ink) hover:bg-(--color-sidebar)"
+        active-class="text-(--color-ink) font-semibold bg-(--color-sidebar)/60"
+      >
+        {{ t("nav.publish") }}
+      </NuxtLink>
+      <span
+        class="px-3 py-1.5 rounded text-(--color-ink-muted) cursor-not-allowed"
+        :title="t('nav.comingSoon')"
+        aria-disabled="true"
+      >
+        {{ t("nav.docs") }}
+      </span>
+    </nav>
+
     <ThemeSwitch />
     <LocaleSwitch />
     <UserButton />
