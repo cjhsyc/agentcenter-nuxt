@@ -309,9 +309,10 @@ Theme tokens in `app/assets/css/tailwind.css` via Tailwind v4 `@theme` blocks. I
 - The Extension detail page's install button.
 
 **Do NOT use accent for:**
-- Sidebar active state — use a 2px left rule + neutral ink + bold weight.
+- Sidebar active state — use a 2px left rule in `--color-ink`, plus `bg-(--color-sidebar)/60` and `font-semibold`. No tinted fills, no accent on the rule itself.
 - Filter trigger pills (Dept, FuncCategory, Creator, Publisher, TagDrawer) when applied — use `border-(--color-ink)/35 + font-semibold` instead of tinted fill.
-- Non-primary popover row selections — text-only emphasis is fine.
+- Inner popover chips and row selections — neutral ink + `font-semibold`. The popover is itself a focused interaction; the selected row reads as "current" through weight without needing chromatic emphasis.
+- Decorative dots and bullets in the sidebar — use `bg-(--color-ink-muted)`.
 
 **Exempt (intentionally accent-heavy):**
 - Auth flows (sign-in, sign-up, CLI device auth, onboarding) — these screens are essentially landing pages with one CTA each.

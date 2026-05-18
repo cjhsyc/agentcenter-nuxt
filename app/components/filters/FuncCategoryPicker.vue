@@ -155,7 +155,7 @@ const hasActive = computed(() => Boolean(filters.value.funcCat))
           type="button"
           class="rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors"
           :class="!hasActive
-            ? 'border-(--color-accent) bg-(--color-accent)/10 text-(--color-accent)'
+            ? 'border-(--color-ink)/35 text-(--color-ink) font-semibold'
             : 'border-(--color-border) text-(--color-ink-muted) hover:text-(--color-ink)'"
           @click="selectAll"
         >
@@ -191,7 +191,7 @@ const hasActive = computed(() => Boolean(filters.value.funcCat))
             type="button"
             class="flex flex-1 items-center gap-2 rounded-sm px-2 py-1 text-left text-sm hover:bg-(--color-sidebar)"
             :class="row.isActive
-              ? 'text-(--color-accent) font-medium'
+              ? 'text-(--color-ink) font-semibold'
               : 'text-(--color-ink)'"
             @click="onRowSelect(row)"
           >

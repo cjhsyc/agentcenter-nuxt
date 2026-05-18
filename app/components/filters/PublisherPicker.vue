@@ -53,7 +53,7 @@ function selectPublisher(id: string | undefined) {
         <button
           type="button"
           class="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm hover:bg-(--color-sidebar)"
-          :class="!activePublisher ? 'text-(--color-accent) font-medium' : 'text-(--color-ink)'"
+          :class="!activePublisher ? 'text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
           @click="selectPublisher(undefined)"
         >
           <span>{{ t("filters.publisher.any") }}</span>
@@ -63,7 +63,7 @@ function selectPublisher(id: string | undefined) {
           :key="p.id"
           type="button"
           class="flex w-full items-center justify-between gap-3 px-3 py-1.5 text-left text-sm hover:bg-(--color-sidebar)"
-          :class="activePublisher?.id === p.id ? 'text-(--color-accent) font-medium' : 'text-(--color-ink)'"
+          :class="activePublisher?.id === p.id ? 'text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
           @click="selectPublisher(p.id)"
         >
           <span class="truncate">{{ publisherLabel(p) }}</span>

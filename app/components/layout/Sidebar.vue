@@ -110,7 +110,7 @@ function toggleSection(key: "explore" | "browse" | "collections") {
             v-else
             :to="localePath(item.to)"
             class="flex w-full items-center gap-2.5 rounded-md border-l-2 border-transparent px-2 py-1.5 text-[13px] font-medium text-(--color-ink) transition hover:bg-(--color-sidebar)"
-            active-class="border-l-(--color-accent) bg-(--color-sidebar)/60 font-semibold"
+            active-class="border-l-(--color-ink) bg-(--color-sidebar)/60 font-semibold"
           >
             <component :is="item.Icon" :size="14" class="shrink-0" />
             <span class="flex-1 truncate">{{ t(item.labelKey) }}</span>
@@ -139,7 +139,7 @@ function toggleSection(key: "explore" | "browse" | "collections") {
           :key="item.key"
           :to="buildHref({ category: item.key === activeCategory ? null : (item.key === 'all' ? null : item.key) })"
           class="flex w-full items-center gap-2.5 rounded-md border-l-2 px-2 py-1.5 text-[13px] font-medium text-(--color-ink) transition hover:bg-(--color-sidebar)"
-          :class="activeCategory === item.key ? 'border-l-(--color-accent) bg-(--color-sidebar)/60 font-semibold' : 'border-transparent'"
+          :class="activeCategory === item.key ? 'border-l-(--color-ink) bg-(--color-sidebar)/60 font-semibold' : 'border-transparent'"
         >
           <component :is="item.Icon" :size="14" class="shrink-0" />
           <span class="flex-1 truncate">{{ t(item.labelKey) }}</span>
@@ -175,7 +175,7 @@ function toggleSection(key: "explore" | "browse" | "collections") {
           aria-disabled="true"
           class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] text-(--color-ink-muted)"
         >
-          <span class="bg-(--color-accent) size-1.5 shrink-0 rounded-full" />
+          <span class="bg-(--color-ink-muted) size-1.5 shrink-0 rounded-full" />
           <span class="flex-1 truncate">{{ col.name }}</span>
         </div>
         <div

@@ -52,7 +52,7 @@ function selectCreator(id: string | undefined) {
         <button
           type="button"
           class="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm hover:bg-(--color-sidebar)"
-          :class="!activeCreator ? 'text-(--color-accent) font-medium' : 'text-(--color-ink)'"
+          :class="!activeCreator ? 'text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
           @click="selectCreator(undefined)"
         >
           <span>{{ t("filters.creator.any") }}</span>
@@ -62,7 +62,7 @@ function selectCreator(id: string | undefined) {
           :key="c.id"
           type="button"
           class="flex w-full items-center justify-between gap-3 px-3 py-1.5 text-left text-sm hover:bg-(--color-sidebar)"
-          :class="activeCreator?.id === c.id ? 'text-(--color-accent) font-medium' : 'text-(--color-ink)'"
+          :class="activeCreator?.id === c.id ? 'text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
           @click="selectCreator(c.id)"
         >
           <span class="truncate">{{ creatorLabel(c) }}</span>

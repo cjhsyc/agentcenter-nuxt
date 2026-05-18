@@ -65,8 +65,9 @@ describe("ExtFeatureHero", () => {
       ...mountOpts,
       props: { extension: fixture({ slug: "web-search" }) },
     })
-    const links = wrapper.findAll("a").map((a) => a.attributes("href"))
-    expect(links.some((href) => href?.includes("/extensions/web-search"))).toBe(true)
+    const hrefs = wrapper.findAll("a").map((a) => a.attributes("href") ?? "")
+    // Locale URLs are always prefixed (CLAUDE.md locked decision #5).
+    expect(hrefs.some((href) => /^\/(en|zh)\/extensions\/web-search$/.test(href))).toBe(true)
   })
 
   it("omits the tagline paragraph when tagline is null", async () => {
