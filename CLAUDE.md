@@ -35,6 +35,7 @@ These mirror the original v1 product decisions. Same numbering; do not revisit i
 8. **Agent CLI**: agent-agnostic with Claude-first defaults. Extensions declare destination paths per agent in their manifest; user can override via `agentcenter config set`. Default target: `~/.claude/...`. Distributed via npm.
 9. **Department IDs**: dotted-path text PKs (e.g. `eng.cloud.infra`). Descendant filter is a single `LIKE 'parent.%'` predicate, not a recursive CTE.
 10. **Dynamic content i18n**: column-per-language (`name` + `nameZh`, `description` + `descriptionZh`). `tags` table carries `labelEn` + `labelZh`.
+11. **Accent usage**: `--color-accent` is reserved for primary CTAs, focus rings, the home featured hero, and the active extension-detail install action. Secondary active states (sidebar nav, filter trigger pills, non-primary picker chips) use neutral ink + left-rule or bold weight, not tinted fills. The home should carry at most two accent moments per viewport; the goal is "one intentional accent moment" wherever practical. Auth pages, error states, and UI primitive focus rings are exempt.
 
 Nuxt-specific technical decisions (deployment target, auth choice, DB driver, storage default, public API contract, validate pipeline, coverage thresholds, layer boundaries) live in `docs/plan.md` so they only have to be maintained in one place.
 

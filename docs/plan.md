@@ -298,6 +298,28 @@ Theme tokens in `app/assets/css/tailwind.css` via Tailwind v4 `@theme` blocks. I
 
 `ThemeSwitch` is a dropdown (sun / moon / contrast icons + preview tiles per option) that writes the `theme` cookie. `useTheme` reads the cookie via `useCookie` and applies the matching class (`""` for ivory, `dark`, `mono`) to `<html>` via `useHead` — serialised into the SSR HTML so the initial paint already carries the correct theme, no flash on hydrate. Fonts loaded via `@nuxt/fonts` and wired into the CSS variables.
 
+### Accent usage convention
+
+`--color-accent` is the only chromatic token in the editorial palette, so it has to be spent carefully. Locked decision #11 (in `CLAUDE.md`) governs where it appears.
+
+**Use accent for:**
+- Primary CTAs (Install on the detail page, the home hero's "View extension" arrow).
+- Focus rings on form inputs and interactive controls.
+- The home featured hero (left-rule + CTA arrow only).
+- The Extension detail page's install button.
+
+**Do NOT use accent for:**
+- Sidebar active state — use a 2px left rule + neutral ink + bold weight.
+- Filter trigger pills (Dept, FuncCategory, Creator, Publisher, TagDrawer) when applied — use `border-(--color-ink)/35 + font-semibold` instead of tinted fill.
+- Non-primary popover row selections — text-only emphasis is fine.
+
+**Exempt (intentionally accent-heavy):**
+- Auth flows (sign-in, sign-up, CLI device auth, onboarding) — these screens are essentially landing pages with one CTA each.
+- UI primitive focus rings (`Button`, `Input`, `Checkbox`, `SelectTrigger`, `Textarea`) — accent focus is a system signal, not chrome.
+- Error boundaries — the retry CTA carries the accent fill.
+
+Rule of thumb: a viewport should carry **at most two** intentional accent moments. The home should typically have **one** (the featured hero or the fallback CTA). When introducing a new accent hit, ask whether it's earning attention or just adding noise — if removing it doesn't degrade comprehension, remove it.
+
 ---
 
 ## 6. Auth & access model
