@@ -123,6 +123,11 @@ export async function countFiltered(
 export async function findFeatured(db: Transactable) {
   // Prefer the hand-curated row. Fall back to top-downloaded so the home
   // hero is never empty.
+  //
+  // Both queries cap to one row; without a stable tiebreaker the choice
+  // would flap on ties (two curated rows published at the same instant,
+  // or two extensions with identical download counts). Sort by id last so
+  // the home hero is deterministic across requests.
   const [curated] = await db
     .select(listSelect)
     .from(extensions)
@@ -134,7 +139,7 @@ export async function findFeatured(db: Transactable) {
       ),
     )
     .groupBy(extensions.id)
-    .orderBy(desc(extensions.publishedAt))
+    .orderBy(desc(extensions.publishedAt), desc(extensions.id))
     .limit(1)
   if (curated) return curated
 
@@ -144,7 +149,11 @@ export async function findFeatured(db: Transactable) {
     .leftJoin(extensionTags, eq(extensionTags.extensionId, extensions.id))
     .where(eq(extensions.visibility, "published"))
     .groupBy(extensions.id)
-    .orderBy(desc(extensions.downloadsCount))
+    .orderBy(
+      desc(extensions.downloadsCount),
+      desc(extensions.publishedAt),
+      desc(extensions.id),
+    )
     .limit(1)
   return fallback ?? null
 }

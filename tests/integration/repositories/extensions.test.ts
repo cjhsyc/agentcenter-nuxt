@@ -187,6 +187,47 @@ describe("extensions repository", () => {
       const featured = await extensionsRepo.findFeatured(db)
       expect(featured).toBeNull()
     })
+
+    it("breaks curated-row ties deterministically by id when publishedAt matches", async () => {
+      const sharedTime = new Date("2026-05-01T00:00:00Z")
+      await seedExtension({
+        id: "ext-a",
+        slug: "pick-a",
+        featured: true,
+        publishedAt: sharedTime,
+      })
+      await seedExtension({
+        id: "ext-b",
+        slug: "pick-b",
+        featured: true,
+        publishedAt: sharedTime,
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      // desc(id) tiebreaker → 'ext-b' > 'ext-a' lexicographically.
+      expect(featured?.slug).toBe("pick-b")
+    })
+
+    it("breaks fallback ties deterministically when downloadsCount matches", async () => {
+      const sharedTime = new Date("2026-05-01T00:00:00Z")
+      await seedExtension({
+        id: "ext-a",
+        slug: "tie-a",
+        downloadsCount: 100,
+        publishedAt: sharedTime,
+      })
+      await seedExtension({
+        id: "ext-b",
+        slug: "tie-b",
+        downloadsCount: 100,
+        publishedAt: sharedTime,
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      // No curated rows → fallback path. desc(id) wins after the
+      // downloads + publishedAt ties.
+      expect(featured?.slug).toBe("tie-b")
+    })
   })
 
   describe("findRelated", () => {
