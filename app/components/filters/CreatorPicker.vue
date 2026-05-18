@@ -33,7 +33,7 @@ function selectCreator(id: string | undefined) {
       :class="[
         'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] transition-colors',
         activeCreator
-          ? 'border-(--color-accent)/40 bg-(--color-accent)/10 text-(--color-accent)'
+          ? 'border-(--color-ink)/35 bg-(--color-card) text-(--color-ink) font-semibold'
           : 'border-(--color-border) bg-(--color-card) text-(--color-ink-muted) hover:text-(--color-ink)',
       ]"
     >
@@ -52,7 +52,7 @@ function selectCreator(id: string | undefined) {
         <button
           type="button"
           class="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm hover:bg-(--color-sidebar)"
-          :class="!activeCreator ? 'text-(--color-accent) font-medium' : 'text-(--color-ink)'"
+          :class="!activeCreator ? 'text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
           @click="selectCreator(undefined)"
         >
           <span>{{ t("filters.creator.any") }}</span>
@@ -62,7 +62,7 @@ function selectCreator(id: string | undefined) {
           :key="c.id"
           type="button"
           class="flex w-full items-center justify-between gap-3 px-3 py-1.5 text-left text-sm hover:bg-(--color-sidebar)"
-          :class="activeCreator?.id === c.id ? 'text-(--color-accent) font-medium' : 'text-(--color-ink)'"
+          :class="activeCreator?.id === c.id ? 'text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
           @click="selectCreator(c.id)"
         >
           <span class="truncate">{{ creatorLabel(c) }}</span>

@@ -78,7 +78,7 @@ function deptName(d: Department): string {
       :class="[
         'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] transition-colors',
         activeDept
-          ? 'border-(--color-accent)/40 bg-(--color-accent)/10 text-(--color-accent)'
+          ? 'border-(--color-ink)/35 bg-(--color-card) text-(--color-ink) font-semibold'
           : 'border-(--color-border) bg-(--color-card) text-(--color-ink-muted) hover:text-(--color-ink)',
       ]"
     >
@@ -93,7 +93,7 @@ function deptName(d: Department): string {
           type="button"
           class="rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors"
           :class="filters.dept === MY_DEPT_ID
-            ? 'border-(--color-accent) bg-(--color-accent)/10 text-(--color-accent)'
+            ? 'border-(--color-ink)/35 text-(--color-ink) font-semibold'
             : 'border-(--color-border) text-(--color-ink-muted) hover:text-(--color-ink)'"
           @click="selectDept(MY_DEPT_ID)"
         >
@@ -103,7 +103,7 @@ function deptName(d: Department): string {
           type="button"
           class="rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors"
           :class="filters.dept === orgRootId
-            ? 'border-(--color-accent) bg-(--color-accent)/10 text-(--color-accent)'
+            ? 'border-(--color-ink)/35 text-(--color-ink) font-semibold'
             : 'border-(--color-border) text-(--color-ink-muted) hover:text-(--color-ink)'"
           @click="selectDept(orgRootId)"
         >
@@ -113,7 +113,7 @@ function deptName(d: Department): string {
           type="button"
           class="rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors"
           :class="!filters.dept
-            ? 'border-(--color-accent) bg-(--color-accent)/10 text-(--color-accent)'
+            ? 'border-(--color-ink)/35 text-(--color-ink) font-semibold'
             : 'border-(--color-border) text-(--color-ink-muted) hover:text-(--color-ink)'"
           @click="selectDept(undefined)"
         >
@@ -145,7 +145,7 @@ function deptName(d: Department): string {
             type="button"
             class="flex flex-1 items-center justify-between gap-2 rounded-sm px-2 py-1 text-left text-sm hover:bg-(--color-sidebar)"
             :class="filters.dept === row.dept.id
-              ? 'text-(--color-accent) font-medium'
+              ? 'text-(--color-ink) font-semibold'
               : 'text-(--color-ink)'"
             @click="selectDept(row.dept.id)"
           >

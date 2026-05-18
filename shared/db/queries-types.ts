@@ -19,6 +19,8 @@ export interface ExtensionListItem {
   iconColor: string | null
   name: string
   nameZh: string | null
+  tagline: string | null
+  taglineZh: string | null
   description: string | null
   descriptionZh: string | null
   downloadsCount: number

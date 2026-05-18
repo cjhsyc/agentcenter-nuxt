@@ -119,7 +119,39 @@ describe("extensions repository", () => {
   })
 
   describe("findFeatured", () => {
-    it("returns the published extension with the most downloads", async () => {
+    it("prefers the curated row over higher-download alternatives", async () => {
+      await seedExtension({ id: "ext-top", slug: "top", downloadsCount: 999 })
+      await seedExtension({
+        id: "ext-pick",
+        slug: "pick",
+        downloadsCount: 5,
+        featured: true,
+        publishedAt: new Date("2026-05-01T00:00:00Z"),
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      expect(featured?.slug).toBe("pick")
+    })
+
+    it("among curated rows, returns the most recently published", async () => {
+      await seedExtension({
+        id: "ext-old",
+        slug: "old-pick",
+        featured: true,
+        publishedAt: new Date("2026-01-01T00:00:00Z"),
+      })
+      await seedExtension({
+        id: "ext-new",
+        slug: "new-pick",
+        featured: true,
+        publishedAt: new Date("2026-05-01T00:00:00Z"),
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      expect(featured?.slug).toBe("new-pick")
+    })
+
+    it("falls back to the top-downloaded published row when nothing is curated", async () => {
       await seedExtension({ id: "ext-low", slug: "low", downloadsCount: 5 })
       await seedExtension({ id: "ext-high", slug: "high", downloadsCount: 50 })
       await seedExtension({
@@ -133,10 +165,68 @@ describe("extensions repository", () => {
       expect(featured?.slug).toBe("high")
     })
 
+    it("ignores draft rows even when marked featured", async () => {
+      await seedExtension({
+        id: "ext-draft-pick",
+        slug: "draft-pick",
+        featured: true,
+        visibility: "draft",
+      })
+      await seedExtension({
+        id: "ext-pub",
+        slug: "pub",
+        downloadsCount: 1,
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      expect(featured?.slug).toBe("pub")
+    })
+
     it("returns null when nothing is published", async () => {
       await seedExtension({ visibility: "draft" })
       const featured = await extensionsRepo.findFeatured(db)
       expect(featured).toBeNull()
+    })
+
+    it("breaks curated-row ties deterministically by id when publishedAt matches", async () => {
+      const sharedTime = new Date("2026-05-01T00:00:00Z")
+      await seedExtension({
+        id: "ext-a",
+        slug: "pick-a",
+        featured: true,
+        publishedAt: sharedTime,
+      })
+      await seedExtension({
+        id: "ext-b",
+        slug: "pick-b",
+        featured: true,
+        publishedAt: sharedTime,
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      // desc(id) tiebreaker → 'ext-b' > 'ext-a' lexicographically.
+      expect(featured?.slug).toBe("pick-b")
+    })
+
+    it("breaks fallback ties deterministically when downloadsCount matches", async () => {
+      const sharedTime = new Date("2026-05-01T00:00:00Z")
+      await seedExtension({
+        id: "ext-a",
+        slug: "tie-a",
+        downloadsCount: 100,
+        publishedAt: sharedTime,
+      })
+      await seedExtension({
+        id: "ext-b",
+        slug: "tie-b",
+        downloadsCount: 100,
+        publishedAt: sharedTime,
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      // No curated rows → fallback path. desc(id) wins after the
+      // downloads + publishedAt ties.
+      expect(featured?.slug).toBe("tie-b")
     })
   })
 

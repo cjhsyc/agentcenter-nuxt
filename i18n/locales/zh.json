@@ -91,16 +91,10 @@
   "sidebar": {
     "browse": "浏览",
     "categories": "分类",
-    "collections": "收藏夹",
-    "mine": "我的",
-    "allExtensions": "全部扩展",
     "skills": "Skill",
     "mcpServers": "MCP",
     "slashCommands": "斜杠命令",
-    "plugins": "插件",
-    "all": "全部",
-    "saved": "已收藏",
-    "newGroup": "新建分组"
+    "plugins": "插件"
   },
   "search": {
     "placeholder": "搜索 Skill、MCP、斜杠命令…"

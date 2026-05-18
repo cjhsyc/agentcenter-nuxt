@@ -91,16 +91,10 @@
   "sidebar": {
     "browse": "Browse",
     "categories": "Categories",
-    "collections": "Collections",
-    "mine": "MINE",
-    "allExtensions": "All Extensions",
     "skills": "Skills",
     "mcpServers": "MCP Servers",
     "slashCommands": "Slash Commands",
-    "plugins": "Plugins",
-    "all": "All",
-    "saved": "Saved",
-    "newGroup": "New Group"
+    "plugins": "Plugins"
   },
   "search": {
     "placeholder": "Search skills, MCP servers, slash commands…"

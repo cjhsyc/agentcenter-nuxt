@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const { t } = useI18n()
-// The MCP Panorama page renders its own LayerSidebar (which depends on
-// page state). This layout is identical to default.vue minus the global
-// AgentCenter Sidebar, leaving the page free to compose its own chrome.
+// The MCP Panorama page renders its own LayerSidebar inside <main>.
+// This layout omits the global aside slot so the page-owned sidebar
+// owns the gutter; primary nav stays reachable through the TopBar.
 const sidebarCollapsed = ref(true)
 function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value
@@ -19,7 +19,7 @@ function toggleSidebar() {
     </a>
 
     <header
-      class="sticky top-0 z-10 h-[52px] border-b border-(--color-border) bg-(--color-card) flex items-center px-4 gap-3"
+      class="sticky top-0 z-10 h-16 border-b border-(--color-border) bg-(--color-card) flex items-center px-5 gap-4"
       role="banner"
     >
       <TopBar :collapsed="sidebarCollapsed" @toggle-sidebar="toggleSidebar" />
