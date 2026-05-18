@@ -119,7 +119,39 @@ describe("extensions repository", () => {
   })
 
   describe("findFeatured", () => {
-    it("returns the published extension with the most downloads", async () => {
+    it("prefers the curated row over higher-download alternatives", async () => {
+      await seedExtension({ id: "ext-top", slug: "top", downloadsCount: 999 })
+      await seedExtension({
+        id: "ext-pick",
+        slug: "pick",
+        downloadsCount: 5,
+        featured: true,
+        publishedAt: new Date("2026-05-01T00:00:00Z"),
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      expect(featured?.slug).toBe("pick")
+    })
+
+    it("among curated rows, returns the most recently published", async () => {
+      await seedExtension({
+        id: "ext-old",
+        slug: "old-pick",
+        featured: true,
+        publishedAt: new Date("2026-01-01T00:00:00Z"),
+      })
+      await seedExtension({
+        id: "ext-new",
+        slug: "new-pick",
+        featured: true,
+        publishedAt: new Date("2026-05-01T00:00:00Z"),
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      expect(featured?.slug).toBe("new-pick")
+    })
+
+    it("falls back to the top-downloaded published row when nothing is curated", async () => {
       await seedExtension({ id: "ext-low", slug: "low", downloadsCount: 5 })
       await seedExtension({ id: "ext-high", slug: "high", downloadsCount: 50 })
       await seedExtension({
@@ -131,6 +163,23 @@ describe("extensions repository", () => {
 
       const featured = await extensionsRepo.findFeatured(db)
       expect(featured?.slug).toBe("high")
+    })
+
+    it("ignores draft rows even when marked featured", async () => {
+      await seedExtension({
+        id: "ext-draft-pick",
+        slug: "draft-pick",
+        featured: true,
+        visibility: "draft",
+      })
+      await seedExtension({
+        id: "ext-pub",
+        slug: "pub",
+        downloadsCount: 1,
+      })
+
+      const featured = await extensionsRepo.findFeatured(db)
+      expect(featured?.slug).toBe("pub")
     })
 
     it("returns null when nothing is published", async () => {

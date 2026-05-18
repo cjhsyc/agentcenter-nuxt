@@ -35,6 +35,8 @@ const listSelect = {
   iconColor: extensions.iconColor,
   name: extensions.name,
   nameZh: extensions.nameZh,
+  tagline: extensions.tagline,
+  taglineZh: extensions.taglineZh,
   description: extensions.description,
   descriptionZh: extensions.descriptionZh,
   downloadsCount: extensions.downloadsCount,
@@ -119,7 +121,24 @@ export async function countFiltered(
 }
 
 export async function findFeatured(db: Transactable) {
-  const [row] = await db
+  // Prefer the hand-curated row. Fall back to top-downloaded so the home
+  // hero is never empty.
+  const [curated] = await db
+    .select(listSelect)
+    .from(extensions)
+    .leftJoin(extensionTags, eq(extensionTags.extensionId, extensions.id))
+    .where(
+      and(
+        eq(extensions.visibility, "published"),
+        eq(extensions.featured, true),
+      ),
+    )
+    .groupBy(extensions.id)
+    .orderBy(desc(extensions.publishedAt))
+    .limit(1)
+  if (curated) return curated
+
+  const [fallback] = await db
     .select(listSelect)
     .from(extensions)
     .leftJoin(extensionTags, eq(extensionTags.extensionId, extensions.id))
@@ -127,7 +146,7 @@ export async function findFeatured(db: Transactable) {
     .groupBy(extensions.id)
     .orderBy(desc(extensions.downloadsCount))
     .limit(1)
-  return row ?? null
+  return fallback ?? null
 }
 
 export async function findRelated(
