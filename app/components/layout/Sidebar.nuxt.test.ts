@@ -39,17 +39,19 @@ describe("Sidebar", () => {
     expect(browseLinks.length).toBe(4)
   })
 
-  it("renders the function-types tree with default-expanded workTask", async () => {
+  it("renders all three funcCat L0 labels collapsed by default", async () => {
     const wrapper = await mountSuspended(Sidebar, mountOpts)
     const html = wrapper.html().toLowerCase()
     expect(html).toContain("work task")
-    // workTask's first L1 row should be visible after default expansion.
-    expect(html).toContain("system design")
+    expect(html).toContain("business")
+    expect(html).toContain("tools")
   })
 
-  it("does not expand sibling funcCats by default (no 'Network Protocols' visible)", async () => {
+  it("does not expand any funcCat by default (L1 rows hidden until clicked)", async () => {
     const wrapper = await mountSuspended(Sidebar, mountOpts)
-    expect(wrapper.html().toLowerCase()).not.toContain("network protocols")
+    const html = wrapper.html().toLowerCase()
+    expect(html).not.toContain("system design")
+    expect(html).not.toContain("network protocols")
   })
 
   it("collapsed prop hides the inner content", async () => {

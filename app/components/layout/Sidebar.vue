@@ -50,8 +50,10 @@ const expansion = reactive({
   l1: {} as Record<string, boolean>,
 })
 
+// Default: nothing expanded. Users pick a funcCat to drill in. A
+// roomier sidebar means default-expanded workTask pushes L2 below the
+// fold; let users open one branch at a time.
 if (activeFuncCat.value) expansion.funcCats[activeFuncCat.value] = true
-else expansion.funcCats.workTask = true
 if (activeSubCat.value) expansion.l1[activeSubCat.value] = true
 
 watch(activeFuncCat, (next) => {
@@ -87,28 +89,28 @@ function toggleL1(key: string) {
 </script>
 
 <template>
-  <div v-if="!collapsed" class="min-w-[200px] flex-1 overflow-y-auto p-3 text-(--color-ink)">
+  <div v-if="!collapsed" class="min-w-[200px] flex-1 overflow-y-auto px-5 py-3 text-(--color-ink)">
     <!-- Browse section -->
     <div class="mb-1">
       <button
         type="button"
-        class="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-[11px] font-bold tracking-wider uppercase text-(--color-ink-muted) hover:text-(--color-ink)"
+        class="flex w-full items-center justify-between rounded-md px-2 py-2 font-serif text-[15px] font-semibold tracking-tight text-(--color-ink) hover:text-(--color-ink)"
         :aria-expanded="expansion.sections.browse"
         @click="toggleSection('browse')"
       >
         {{ t("sidebar.browse") }}
-        <ChevronDown v-if="expansion.sections.browse" :size="14" aria-hidden="true" />
-        <ChevronRight v-else :size="14" aria-hidden="true" />
+        <ChevronDown v-if="expansion.sections.browse" :size="16" aria-hidden="true" />
+        <ChevronRight v-else :size="16" aria-hidden="true" />
       </button>
       <div v-if="expansion.sections.browse" class="mt-0.5 flex flex-col gap-px">
         <NuxtLink
           v-for="item in BROWSE_ITEMS"
           :key="item.key"
           :to="buildHref({ category: item.key === activeCategory ? null : item.key })"
-          class="flex w-full items-center gap-2.5 rounded-md border-l-2 px-2 py-1.5 text-[13px] font-medium text-(--color-ink) transition hover:bg-(--color-card)"
+          class="flex w-full items-center gap-2.5 rounded-md border-l-2 px-2 py-1.5 text-[15px] font-medium text-(--color-ink) transition hover:bg-(--color-card)"
           :class="activeCategory === item.key ? 'border-l-(--color-ink) bg-(--color-sidebar)/60 font-semibold' : 'border-transparent'"
         >
-          <component :is="item.Icon" :size="14" class="shrink-0" />
+          <component :is="item.Icon" :size="16" class="shrink-0" />
           <span class="flex-1 truncate">{{ t(item.labelKey) }}</span>
         </NuxtLink>
       </div>
@@ -120,23 +122,23 @@ function toggleL1(key: string) {
     <div class="mb-1">
       <button
         type="button"
-        class="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-[11px] font-bold tracking-wider uppercase text-(--color-ink-muted) hover:text-(--color-ink)"
+        class="flex w-full items-center justify-between rounded-md px-2 py-2 font-serif text-[15px] font-semibold tracking-tight text-(--color-ink) hover:text-(--color-ink)"
         :aria-expanded="expansion.sections.categories"
         @click="toggleSection('categories')"
       >
         {{ t("sidebar.categories") }}
-        <ChevronDown v-if="expansion.sections.categories" :size="14" aria-hidden="true" />
-        <ChevronRight v-else :size="14" aria-hidden="true" />
+        <ChevronDown v-if="expansion.sections.categories" :size="16" aria-hidden="true" />
+        <ChevronRight v-else :size="16" aria-hidden="true" />
       </button>
       <div v-if="expansion.sections.categories" class="mt-0.5 flex flex-col gap-px">
         <div v-for="cat in FUNC_TAXONOMY" :key="cat.key">
           <div class="flex items-center">
             <NuxtLink
               :to="buildHref({ funcCat: activeFuncCat === cat.key && !activeSubCat && !activeL2 ? null : cat.key, subCat: null, l2: null })"
-              class="flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] font-semibold transition hover:bg-(--color-card)"
+              class="flex flex-1 items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[15px] font-semibold transition hover:bg-(--color-card)"
               :class="activeFuncCat === cat.key && !activeSubCat && !activeL2 ? 'bg-(--color-sidebar)/60 text-(--color-ink)' : 'text-(--color-ink)'"
             >
-              <span class="size-[7px] shrink-0 rounded-sm" :style="{ background: FUNC_CAT_COLORS[cat.key] }" />
+              <span class="size-[9px] shrink-0 rounded-sm" :style="{ background: FUNC_CAT_COLORS[cat.key] }" />
               <span class="flex-1">{{ t(`taxonomy.funcCat.${cat.key}`) }}</span>
             </NuxtLink>
             <button
@@ -146,8 +148,8 @@ function toggleL1(key: string) {
               :aria-expanded="expansion.funcCats[cat.key] ?? false"
               @click="toggleFuncCat(cat.key)"
             >
-              <ChevronDown v-if="expansion.funcCats[cat.key]" :size="12" aria-hidden="true" />
-              <ChevronRight v-else :size="12" aria-hidden="true" />
+              <ChevronDown v-if="expansion.funcCats[cat.key]" :size="14" aria-hidden="true" />
+              <ChevronRight v-else :size="14" aria-hidden="true" />
             </button>
           </div>
 
@@ -156,7 +158,7 @@ function toggleL1(key: string) {
               <div class="flex items-center">
                 <NuxtLink
                   :to="buildHref({ funcCat: cat.key, subCat: activeSubCat === l1.key ? null : l1.key, l2: null })"
-                  class="flex flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12.5px] font-medium hover:bg-(--color-card)"
+                  class="flex flex-1 items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13.5px] font-medium hover:bg-(--color-card)"
                   :class="activeSubCat === l1.key && !activeL2 ? 'bg-(--color-sidebar)/60 text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
                 >
                   <span
@@ -173,8 +175,8 @@ function toggleL1(key: string) {
                   :aria-expanded="expansion.l1[l1.key] ?? false"
                   @click="toggleL1(l1.key)"
                 >
-                  <ChevronDown v-if="expansion.l1[l1.key]" :size="11" aria-hidden="true" />
-                  <ChevronRight v-else :size="11" aria-hidden="true" />
+                  <ChevronDown v-if="expansion.l1[l1.key]" :size="13" aria-hidden="true" />
+                  <ChevronRight v-else :size="13" aria-hidden="true" />
                 </button>
               </div>
 
@@ -183,7 +185,7 @@ function toggleL1(key: string) {
                   v-for="l2key in l1.l2"
                   :key="l2key"
                   :to="buildHref({ funcCat: cat.key, subCat: l1.key, l2: activeL2 === l2key ? null : l2key })"
-                  class="flex w-full items-center gap-1.5 rounded-md py-1 pr-2 pl-6 text-left text-[12px] hover:bg-(--color-card)"
+                  class="flex w-full items-center gap-1.5 rounded-md py-1 pr-2 pl-6 text-left text-[13px] hover:bg-(--color-card)"
                   :class="activeL2 === l2key ? 'bg-(--color-sidebar)/60 text-(--color-ink) font-semibold' : 'text-(--color-ink)/85'"
                 >
                   <span class="bg-(--color-ink-muted) size-[3px] shrink-0 rounded-full" />
@@ -202,36 +204,36 @@ function toggleL1(key: string) {
     <div class="mb-1">
       <button
         type="button"
-        class="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-[11px] font-bold tracking-wider uppercase text-(--color-ink-muted) hover:text-(--color-ink)"
+        class="flex w-full items-center justify-between rounded-md px-2 py-2 font-serif text-[15px] font-semibold tracking-tight text-(--color-ink) hover:text-(--color-ink)"
         :aria-expanded="expansion.sections.collections"
         @click="toggleSection('collections')"
       >
         {{ t("sidebar.collections") }}
-        <ChevronDown v-if="expansion.sections.collections" :size="14" aria-hidden="true" />
-        <ChevronRight v-else :size="14" aria-hidden="true" />
+        <ChevronDown v-if="expansion.sections.collections" :size="16" aria-hidden="true" />
+        <ChevronRight v-else :size="16" aria-hidden="true" />
       </button>
       <div v-if="expansion.sections.collections" class="mt-0.5 flex flex-col gap-px">
         <div
           aria-disabled="true"
-          class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] text-(--color-ink-muted)"
+          class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[15px] text-(--color-ink-muted)"
         >
-          <Folder :size="14" class="shrink-0" />
+          <Folder :size="16" class="shrink-0" />
           <span class="flex-1">{{ t("sidebar.saved") }}</span>
         </div>
         <div
           v-for="col in COLLECTION_PLACEHOLDERS"
           :key="col.id"
           aria-disabled="true"
-          class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] text-(--color-ink-muted)"
+          class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[15px] text-(--color-ink-muted)"
         >
-          <span class="bg-(--color-ink-muted) size-1.5 shrink-0 rounded-full" />
+          <span class="bg-(--color-ink-muted) size-2 shrink-0 rounded-full" />
           <span class="flex-1 truncate">{{ col.name }}</span>
         </div>
         <div
           aria-disabled="true"
-          class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] text-(--color-ink-muted) opacity-60"
+          class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-[15px] text-(--color-ink-muted) opacity-60"
         >
-          <Plus :size="14" class="shrink-0" />
+          <Plus :size="16" class="shrink-0" />
           <span class="flex-1">{{ t("sidebar.newGroup") }}</span>
         </div>
       </div>
