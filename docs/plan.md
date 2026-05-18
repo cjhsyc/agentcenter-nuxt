@@ -85,7 +85,7 @@ agentcenter-nuxt/
 │   │   └── require-onboard.ts         # redirect to /onboard if no defaultDeptId
 │   └── assets/
 │       └── css/
-│           └── tailwind.css           # @theme tokens (Ivory + Dark)
+│           └── tailwind.css           # @theme tokens (Ivory + Dark + Mono)
 ├── server/
 │   ├── api/
 │   │   ├── v1/                        # PUBLIC CONTRACT — see docs/api.md
@@ -248,15 +248,17 @@ Critical indexing notes — unchanged from the original:
 
 ## 5. Theming
 
-Two themes shipped: **Editorial Ivory** (default) + **Dark**. Mono Clean dropped.
+Three themes shipped: **Editorial Ivory** (default), **Dark**, and **Mono Clean**.
 
-Theme tokens in `app/assets/css/tailwind.css` via Tailwind v4 `@theme` blocks, switched by a `data-theme` attribute on `<html>`:
+Theme tokens in `app/assets/css/tailwind.css` via Tailwind v4 `@theme` blocks. Ivory lives in the base `@theme` block; Dark and Mono Clean live behind `.dark` and `.mono` class selectors applied to `<html>`:
 
 ```css
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  /* Editorial Ivory (default) — same tokens as the original */
+  /* Editorial Ivory (default) */
   --color-bg:           oklch(98.5% 0.008 80);
   --color-sidebar:      oklch(97.5% 0.008 80);
   --color-card:         #ffffff;
@@ -271,7 +273,7 @@ Theme tokens in `app/assets/css/tailwind.css` via Tailwind v4 `@theme` blocks, s
   --radius-card:  10px;
 }
 
-[data-theme="dark"] {
+.dark {
   --color-bg:           oklch(14% 0.006 240);
   --color-sidebar:      oklch(12% 0.005 240);
   --color-card:         oklch(19% 0.008 240);
@@ -281,9 +283,20 @@ Theme tokens in `app/assets/css/tailwind.css` via Tailwind v4 `@theme` blocks, s
   --color-accent:       oklch(72% 0.18 200);
   --color-accent-fg:    oklch(12% 0.01 240);
 }
+
+.mono {
+  --color-bg:           oklch(96% 0 0);
+  --color-sidebar:      oklch(98% 0 0);
+  --color-card:         #ffffff;
+  --color-border:       oklch(88% 0 0);
+  --color-ink:          oklch(14% 0 0);
+  --color-ink-muted:    oklch(52% 0 0);
+  --color-accent:       oklch(22% 0 0);
+  --color-accent-fg:    #ffffff;
+}
 ```
 
-`ThemeSwitch` writes a `theme` cookie and toggles `<html data-theme>`. A Nitro plugin reads the cookie on the SSR pass and stamps `data-theme` on the rendered HTML — no flash on initial load. Fonts loaded via `@nuxt/fonts` and wired into the CSS variables.
+`ThemeSwitch` is a dropdown (sun / moon / contrast icons + preview tiles per option) that writes the `theme` cookie. `useTheme` reads the cookie via `useCookie` and applies the matching class (`""` for ivory, `dark`, `mono`) to `<html>` via `useHead` — serialised into the SSR HTML so the initial paint already carries the correct theme, no flash on hydrate. Fonts loaded via `@nuxt/fonts` and wired into the CSS variables.
 
 ---
 
@@ -836,7 +849,7 @@ These are the v1 binding decisions. Identical to `CLAUDE.md` — repeated here s
 1. **Multi-tenant schema, single-tenant UI** — `organizations` table populated, single org for v1, no org switcher in UI. Multi-org flip is middleware-only later.
 2. **Auth library**: Better Auth.
 3. **Background jobs**: Inngest.
-4. **Themes**: Editorial Ivory + Dark only. Mono Clean dropped.
+4. **Themes**: Editorial Ivory (default) + Dark + Mono Clean. Selected via a 3-way TopBar dropdown and persisted in the `theme` cookie.
 5. **Bundle storage**: Supabase Storage (default). R2 via S3 SDK is a documented alternative.
 6. **Install semantics**: real machine-side install via the Agent CLI. Web records install events; CLI does the work. CLI is **P0** and carries over from the Next.js repo unchanged.
 7. **Sign-up policy**: open.

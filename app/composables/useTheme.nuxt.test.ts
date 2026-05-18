@@ -8,19 +8,14 @@ describe("useTheme", () => {
     expect(theme.value).toBe("ivory")
   })
 
-  it("toggle flips ivory → dark → ivory", () => {
-    const { theme, toggle } = useTheme()
-    theme.value = "ivory"
-    toggle()
-    expect(theme.value).toBe("dark")
-    toggle()
-    expect(theme.value).toBe("ivory")
-  })
-
-  it("set updates the current theme value", () => {
+  it("set updates the current theme value through all three options", () => {
     const { theme, set } = useTheme()
     set("dark")
     expect(theme.value).toBe("dark")
+    set("mono")
+    expect(theme.value).toBe("mono")
+    set("ivory")
+    expect(theme.value).toBe("ivory")
   })
 
   it("invalid persisted value resets to ivory", () => {

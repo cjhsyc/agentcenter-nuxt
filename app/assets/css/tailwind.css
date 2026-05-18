@@ -54,6 +54,29 @@
   --color-layer-public-bg:    oklch(22% 0.04 70);
 }
 
+.mono {
+  --color-bg:           oklch(96% 0 0);
+  --color-sidebar:      oklch(98% 0 0);
+  --color-card:         #ffffff;
+  --color-border:       oklch(88% 0 0);
+  --color-ink:          oklch(14% 0 0);
+  --color-ink-muted:    oklch(52% 0 0);
+  --color-accent:       oklch(22% 0 0);
+  --color-accent-fg:    #ffffff;
+
+  /* MCP Panorama: pure-grey scale, no chroma */
+  --color-status-released:    oklch(30% 0 0);
+  --color-status-released-bg: oklch(92% 0 0);
+  --color-status-dev:         oklch(45% 0 0);
+  --color-status-dev-bg:      oklch(94% 0 0);
+  --color-status-none:        oklch(60% 0 0);
+  --color-status-none-bg:     oklch(96% 0 0);
+  --color-layer-industry:     oklch(28% 0 0);
+  --color-layer-industry-bg:  oklch(92% 0 0);
+  --color-layer-public:       oklch(22% 0 0);
+  --color-layer-public-bg:    oklch(90% 0 0);
+}
+
 @layer components {
   .badge-official { background: oklch(94% 0.025 70); color: oklch(35% 0.07 35); }
   .badge-popular  { background: oklch(94% 0.04 145); color: oklch(35% 0.12 145); }
@@ -61,4 +84,7 @@
   .dark .badge-official { background: oklch(22% 0.06 200); color: oklch(72% 0.18 200); }
   .dark .badge-popular  { background: oklch(22% 0.05 280); color: oklch(72% 0.16 280); }
   .dark .badge-new      { background: oklch(22% 0.05 50);  color: oklch(78% 0.16 50); }
+  .mono .badge-official { background: oklch(20% 0 0); color: #ffffff; }
+  .mono .badge-popular  { background: oklch(88% 0 0); color: oklch(22% 0 0); }
+  .mono .badge-new      { background: oklch(92% 0 0); color: oklch(30% 0 0); }
 }

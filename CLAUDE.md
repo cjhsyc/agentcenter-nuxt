@@ -26,7 +26,7 @@ See `docs/plan.md` for the full implementation plan, milestone schedule, validat
 These mirror the original v1 product decisions. Same numbering; do not revisit inside a normal PR. If a PR needs to change one, update this section and `docs/plan.md` in the same commit as the code change.
 
 1. **Multi-tenant schema, single-tenant UI** for v1.
-2. **Themes**: Editorial Ivory (default) + Dark. Mono Clean dropped.
+2. **Themes**: Editorial Ivory (default) + Dark + Mono Clean. Selectable via the TopBar theme picker; persisted in a `theme` cookie.
 3. **Filter UI**: Mode B (drawer-style multi-row) only.
 4. **Sign-up**: open. SSO/invite-only later if needed.
 5. **Locale URLs**: always prefixed; no implicit default.

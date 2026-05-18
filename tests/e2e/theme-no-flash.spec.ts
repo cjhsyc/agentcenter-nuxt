@@ -34,4 +34,25 @@ test.describe("theme no-flash SSR", () => {
     const html = await response.text()
     expect(html).not.toMatch(/<html[^>]*class="[^"]*\bdark\b/)
   })
+
+  test("theme=mono cookie stamps <html class=\"mono\"> in the SSR response", async ({
+    request,
+  }) => {
+    const response = await request.get("/en", {
+      headers: { Cookie: "theme=mono" },
+    })
+    expect(response.status()).toBe(200)
+    const html = await response.text()
+    expect(html).toMatch(/<html[^>]*class="[^"]*\bmono\b/)
+    expect(html).not.toMatch(/<html[^>]*class="[^"]*\bdark\b/)
+  })
+
+  test("invalid theme cookie falls back to ivory (no class)", async ({ request }) => {
+    const response = await request.get("/en", {
+      headers: { Cookie: "theme=neon" },
+    })
+    expect(response.status()).toBe(200)
+    const html = await response.text()
+    expect(html).not.toMatch(/<html[^>]*class="[^"]*\b(dark|mono)\b/)
+  })
 })

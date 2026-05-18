@@ -1,6 +1,6 @@
 export type Locale = "en" | "zh"
 
-export type Theme = "ivory" | "dark"
+export type Theme = "ivory" | "dark" | "mono"
 
 export type ExtensionCategory = "skills" | "mcp" | "slash" | "plugins"
 export type ExtensionScope = "personal" | "org" | "enterprise"
