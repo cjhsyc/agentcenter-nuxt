@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { McpStatus } from "~~/shared/data/mcp-landscape"
 import type {
   Group,
   GroupStats,
@@ -16,7 +17,11 @@ const props = defineProps<{
   groups: Group[]
   activeMcpId: number | null
 }>()
-const emit = defineEmits<{ pick: [{ tool: ToolDto; mcp: McpDto }] }>()
+const emit = defineEmits<{
+  pick: [{ tool: ToolDto; mcp: McpDto }]
+  drill: [string]
+  filter: [McpStatus]
+}>()
 
 const gridCols = computed(() =>
   props.layer === "industry"
@@ -27,7 +32,13 @@ const gridCols = computed(() =>
 
 <template>
   <div class="px-7 pb-7 flex flex-col gap-5">
-    <LayerSummary :layer="layer" :stats="stats" :groups="groups" />
+    <LayerSummary
+      :layer="layer"
+      :stats="stats"
+      :groups="groups"
+      @drill="(key) => emit('drill', key)"
+      @filter="(s) => emit('filter', s)"
+    />
     <div class="grid gap-3.5 items-start" :style="{ gridTemplateColumns: gridCols }">
       <template v-for="g in groups" :key="g.key">
         <SectorCard
@@ -35,12 +46,14 @@ const gridCols = computed(() =>
           :group="g"
           :active-mcp-id="activeMcpId"
           @pick="(p) => emit('pick', p)"
+          @drill="(key) => emit('drill', key)"
         />
         <DomainCard
           v-else
           :group="g"
           :active-mcp-id="activeMcpId"
           @pick="(p) => emit('pick', p)"
+          @drill="(key) => emit('drill', key)"
         />
       </template>
     </div>

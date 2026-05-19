@@ -4,6 +4,8 @@ import { groupDisplayTitle, type Group } from "~~/shared/mcp-panorama"
 
 const props = defineProps<{ group: Group }>()
 
+const emit = defineEmits<{ drill: [] }>()
+
 const { locale, t } = useI18n()
 const displayTitle = computed(() => groupDisplayTitle(props.group, locale.value))
 
@@ -26,14 +28,19 @@ const legendTooltip = computed(() => {
 <template>
   <header class="flex flex-col gap-1.5">
     <div class="flex items-baseline justify-between gap-3 min-w-0">
-      <div class="flex items-baseline gap-2 min-w-0">
-        <h3 class="font-serif text-[18px] font-medium tracking-tight m-0 truncate text-(--color-ink)">
+      <button
+        type="button"
+        class="flex items-baseline gap-2 min-w-0 bg-transparent border-0 p-0 cursor-pointer text-left text-(--color-ink) hover:text-(--color-accent) transition-colors"
+        :title="t('mcpPanorama.card.drillIn', { name: displayTitle })"
+        @click="emit('drill')"
+      >
+        <h3 class="font-serif text-[18px] font-medium tracking-tight m-0 truncate">
           {{ displayTitle }}
         </h3>
         <span class="font-mono text-[11px] text-(--color-ink-muted) shrink-0">
           {{ group.stats.total }}
         </span>
-      </div>
+      </button>
       <span class="font-mono text-[11px] text-(--color-ink-muted) shrink-0 tabular-nums">
         <span class="text-(--color-ink)">{{ group.stats.counts.released }}</span>/{{ group.stats.total }}
         <span class="opacity-70">{{ t("mcpPanorama.card.releasedShort") }}</span>

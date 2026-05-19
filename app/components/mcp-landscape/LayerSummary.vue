@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { McpStatus } from "~~/shared/data/mcp-landscape"
 import {
   groupDisplayTitle,
   STATUS_ORDER,
@@ -11,6 +12,11 @@ const props = defineProps<{
   layer: Layer
   stats: GroupStats
   groups: Group[]
+}>()
+
+const emit = defineEmits<{
+  drill: [string]
+  filter: [McpStatus]
 }>()
 
 const { locale, t } = useI18n()
@@ -89,35 +95,50 @@ function title(g: Group): string {
     </div>
 
     <!-- Released -->
-    <div class="px-4 py-4 border-l border-(--color-border) flex flex-col gap-1.5 justify-center">
+    <button
+      type="button"
+      class="px-4 py-4 border-l border-(--color-border) flex flex-col gap-1.5 justify-center bg-transparent cursor-pointer text-left text-(--color-ink) hover:bg-(--color-bg) transition-colors"
+      :title="t('mcpPanorama.summary.filterBy', { status: t('mcpPanorama.status.released.label') })"
+      @click="emit('filter', 'released')"
+    >
       <span class="font-mono text-[10px] tracking-wider uppercase text-(--color-ink-muted) inline-flex items-center gap-1.5">
         <span class="size-[5px] rounded-full bg-(--color-status-released)" />
         {{ t("mcpPanorama.summary.released") }}
       </span>
-      <span class="font-serif text-[28px] font-medium text-(--color-ink) leading-none tracking-tight">
+      <span class="font-serif text-[28px] font-medium leading-none tracking-tight">
         {{ stats.counts.released }}
       </span>
-    </div>
+    </button>
     <!-- In Dev -->
-    <div class="px-4 py-4 border-l border-(--color-border) flex flex-col gap-1.5 justify-center">
+    <button
+      type="button"
+      class="px-4 py-4 border-l border-(--color-border) flex flex-col gap-1.5 justify-center bg-transparent cursor-pointer text-left text-(--color-ink) hover:bg-(--color-bg) transition-colors"
+      :title="t('mcpPanorama.summary.filterBy', { status: t('mcpPanorama.status.dev.label') })"
+      @click="emit('filter', 'dev')"
+    >
       <span class="font-mono text-[10px] tracking-wider uppercase text-(--color-ink-muted) inline-flex items-center gap-1.5">
         <span class="size-[5px] rounded-full bg-(--color-status-dev)" />
         {{ t("mcpPanorama.summary.inDev") }}
       </span>
-      <span class="font-serif text-[28px] font-medium text-(--color-ink) leading-none tracking-tight">
+      <span class="font-serif text-[28px] font-medium leading-none tracking-tight">
         {{ stats.counts.dev }}
       </span>
-    </div>
+    </button>
     <!-- No MCP -->
-    <div class="px-4 py-4 border-l border-(--color-border) flex flex-col gap-1.5 justify-center">
+    <button
+      type="button"
+      class="px-4 py-4 border-l border-(--color-border) flex flex-col gap-1.5 justify-center bg-transparent cursor-pointer text-left text-(--color-ink) hover:bg-(--color-bg) transition-colors"
+      :title="t('mcpPanorama.summary.filterBy', { status: t('mcpPanorama.status.none.label') })"
+      @click="emit('filter', 'none')"
+    >
       <span class="font-mono text-[10px] tracking-wider uppercase text-(--color-ink-muted) inline-flex items-center gap-1.5">
         <span class="size-[5px] rounded-full bg-(--color-status-none)" />
         {{ t("mcpPanorama.summary.noMcp") }}
       </span>
-      <span class="font-serif text-[28px] font-medium text-(--color-ink) leading-none tracking-tight">
+      <span class="font-serif text-[28px] font-medium leading-none tracking-tight">
         {{ stats.counts.none }}
       </span>
-    </div>
+    </button>
 
     <!-- Top by release % -->
     <div class="px-5 py-4 border-l border-(--color-border) bg-(--color-bg) flex flex-col gap-1.5">
@@ -126,19 +147,22 @@ function title(g: Group): string {
       </span>
       <div v-if="top3.length === 0" class="text-[12px] text-(--color-ink-muted) italic">—</div>
       <div v-else class="flex flex-col gap-1">
-        <div
+        <button
           v-for="(g, i) in top3"
           :key="g.key"
-          class="flex items-baseline justify-between gap-2"
+          type="button"
+          class="flex items-baseline justify-between gap-2 bg-transparent border-0 p-0 cursor-pointer text-left text-(--color-ink) hover:text-(--color-accent) transition-colors"
+          :title="t('mcpPanorama.card.drillIn', { name: title(g) })"
+          @click="emit('drill', g.key)"
         >
-          <span class="text-[13px] text-(--color-ink) truncate">
+          <span class="text-[13px] truncate">
             <span class="font-mono text-[10px] text-(--color-ink-muted) mr-1.5">#{{ i + 1 }}</span>
             {{ title(g) }}
           </span>
           <span class="font-mono text-[12px] text-(--color-status-released) tabular-nums shrink-0">
             {{ g.stats.releasedPct }}%
           </span>
-        </div>
+        </button>
       </div>
     </div>
   </section>

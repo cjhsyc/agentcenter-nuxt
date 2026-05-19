@@ -3,16 +3,19 @@ import type { DomainGroup, McpDto, ToolDto } from "~~/shared/mcp-panorama"
 import CardHeader from "./CardHeader.vue"
 import PdtBlock from "./PdtBlock.vue"
 
-defineProps<{
+const props = defineProps<{
   group: DomainGroup
   activeMcpId: number | null
 }>()
-const emit = defineEmits<{ pick: [{ tool: ToolDto; mcp: McpDto }] }>()
+const emit = defineEmits<{
+  pick: [{ tool: ToolDto; mcp: McpDto }]
+  drill: [string]
+}>()
 </script>
 
 <template>
   <article class="bg-(--color-card) border border-(--color-border) rounded-xl p-3.5 flex flex-col gap-3">
-    <CardHeader :group="group" />
+    <CardHeader :group="group" @drill="emit('drill', props.group.key)" />
     <div class="grid gap-2.5" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr))">
       <PdtBlock
         v-for="pdt in group.pdts"

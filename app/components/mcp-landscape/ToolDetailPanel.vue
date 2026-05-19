@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight, Factory, Globe2, Link2, X } from "lucide-vue-next"
+import { ArrowRight, Check, Copy, Factory, Globe2, Link2, X } from "lucide-vue-next"
 import {
   mcpDisplayBlurb,
   mcpDisplayName,
@@ -110,6 +110,39 @@ const downstreams = computed<{ tool: ToolDto; mcp: McpDto }[]>(() => {
 function pickMcp(t: ToolDto, m: McpDto) {
   emit("switch-mcp", { tool: t, mcp: m })
 }
+
+const copied = ref(false)
+let copyResetTimer: ReturnType<typeof setTimeout> | null = null
+
+async function copyEndpoint() {
+  if (!mcp.value || mcp.value.status !== "released") return
+  const uri = `mcp://${mcp.value.slug}`
+  try {
+    await navigator.clipboard.writeText(uri)
+    copied.value = true
+    if (copyResetTimer) clearTimeout(copyResetTimer)
+    copyResetTimer = setTimeout(() => {
+      copied.value = false
+      copyResetTimer = null
+    }, 1500)
+  } catch {
+    // Clipboard API unavailable (non-HTTPS dev, denied permission). Stay quiet.
+  }
+}
+
+onBeforeUnmount(() => {
+  if (copyResetTimer) clearTimeout(copyResetTimer)
+})
+
+// Reset the copied state when the active MCP changes so the icon doesn't
+// stay on the green checkmark from a previous selection.
+watch(mcp, () => {
+  copied.value = false
+  if (copyResetTimer) {
+    clearTimeout(copyResetTimer)
+    copyResetTimer = null
+  }
+})
 </script>
 
 <template>
@@ -174,6 +207,18 @@ function pickMcp(t: ToolDto, m: McpDto) {
         </div>
       </div>
 
+      <!-- Tags row -->
+      <div
+        v-if="mcp.tags.length > 0"
+        class="px-6 py-3 border-b border-(--color-border) flex flex-wrap gap-1"
+      >
+        <span
+          v-for="tag in mcp.tags"
+          :key="tag"
+          class="font-mono text-[10px] px-1.5 py-[1px] bg-(--color-border)/40 text-(--color-ink-muted) rounded"
+        >{{ tag }}</span>
+      </div>
+
       <!-- Meta grid -->
       <div class="px-6 py-4 border-b border-(--color-border) grid grid-cols-2 gap-y-4 gap-x-4">
         <div class="flex flex-col gap-1 min-w-0">
@@ -194,7 +239,20 @@ function pickMcp(t: ToolDto, m: McpDto) {
           <span class="font-mono text-[11px] tracking-wide uppercase text-(--color-ink-muted)">
             {{ t("mcpPanorama.detail.endpoint") }}
           </span>
-          <span class="text-[13px] text-(--color-ink) font-mono truncate">{{ endpoint }}</span>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="text-[13px] text-(--color-ink) font-mono truncate flex-1">{{ endpoint }}</span>
+            <button
+              v-if="mcp.status === 'released'"
+              type="button"
+              class="shrink-0 p-1 rounded text-(--color-ink-muted) hover:bg-(--color-border)/40 hover:text-(--color-ink) transition cursor-pointer"
+              :aria-label="t('mcpPanorama.detail.copyEndpoint')"
+              :title="copied ? t('mcpPanorama.detail.copied') : t('mcpPanorama.detail.copyEndpoint')"
+              @click="copyEndpoint"
+            >
+              <Check v-if="copied" :size="12" class="text-(--color-status-released)" />
+              <Copy v-else :size="12" />
+            </button>
+          </div>
         </div>
       </div>
 

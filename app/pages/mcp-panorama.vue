@@ -136,6 +136,16 @@ function clearDrill() {
 function pickMcp(payload: { tool: ToolDto; mcp: McpDto }) {
   active.value = payload
 }
+
+function drillTo(primary: string) {
+  activePrimary.value = primary
+  activeSecondary.value = null
+  active.value = null
+}
+
+function filterTo(status: McpStatus) {
+  statusFilter.value = status
+}
 </script>
 
 <template>
@@ -198,6 +208,8 @@ function pickMcp(payload: { tool: ToolDto; mcp: McpDto }) {
       :groups="filteredGroups"
       :active-mcp-id="active?.mcp.id ?? null"
       @pick="pickMcp"
+      @drill="drillTo"
+      @filter="filterTo"
     />
     <GroupedListView
       v-else-if="data && viewMode === 'list'"
