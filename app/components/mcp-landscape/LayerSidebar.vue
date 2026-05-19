@@ -60,6 +60,10 @@ function toggle(k: string) {
 function rowTitle(g: Group): string {
   return groupDisplayTitle(g, locale.value)
 }
+
+function pdtMcpCount(items: { mcps: { id: number }[] }[]): number {
+  return items.reduce((acc, t) => acc + t.mcps.length, 0)
+}
 </script>
 
 <template>
@@ -130,7 +134,7 @@ function rowTitle(g: Group): string {
         @click="emit('setActive', null, null)"
       >
         <span class="w-3" />
-        <span class="flex-1 text-left truncate">{{ t("mcpPanorama.sidebar.allTools") }}</span>
+        <span class="flex-1 text-left truncate">{{ t("mcpPanorama.sidebar.allMcps") }}</span>
         <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ totalCount }}</span>
       </button>
 
@@ -147,7 +151,7 @@ function rowTitle(g: Group): string {
         >
           <span class="w-3" />
           <span class="flex-1 text-left truncate">{{ rowTitle(g) }}</span>
-          <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ g.items.length }}</span>
+          <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ g.stats.total }}</span>
         </button>
         <!-- Public domain (expandable) -->
         <template v-else-if="g.kind === 'domain'">
@@ -170,7 +174,7 @@ function rowTitle(g: Group): string {
               @click="setActivePrimary(g.key)"
             >
               <span class="flex-1 text-left truncate">{{ rowTitle(g) }}</span>
-              <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ g.items.length }}</span>
+              <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ g.stats.total }}</span>
             </button>
           </div>
           <button
@@ -185,7 +189,7 @@ function rowTitle(g: Group): string {
             @click="setActivePdt(g.key, p.key)"
           >
             <span class="flex-1 text-left truncate">{{ pdtDisplayTitle(p, locale) }}</span>
-            <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ p.items.length }}</span>
+            <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ pdtMcpCount(p.items) }}</span>
           </button>
         </template>
       </template>

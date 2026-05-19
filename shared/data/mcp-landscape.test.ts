@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest"
-import { deriveStatus, ownerToParts } from "./mcp-landscape"
+import { deriveStatus, ownerToParts, rollupStatus } from "./mcp-landscape"
 
 describe("deriveStatus", () => {
   it("released when extensionId is set", () => {
-    expect(deriveStatus({ extensionId: "mcp-ide", inDev: false })).toBe("released")
+    expect(deriveStatus({ extensionId: "mcp-ide-mcp", inDev: false })).toBe("released")
   })
 
   it("released wins even if inDev would also be true (CHECK constraint forbids it but defensive)", () => {
-    expect(deriveStatus({ extensionId: "mcp-ide", inDev: true })).toBe("released")
+    expect(deriveStatus({ extensionId: "mcp-ide-mcp", inDev: true })).toBe("released")
   })
 
   it("dev when no extensionId but inDev is true", () => {
@@ -16,6 +16,23 @@ describe("deriveStatus", () => {
 
   it("none when neither", () => {
     expect(deriveStatus({ extensionId: null, inDev: false })).toBe("none")
+  })
+})
+
+describe("rollupStatus", () => {
+  it("released wins when any MCP is released", () => {
+    expect(rollupStatus(["dev", "released", "none"])).toBe("released")
+    expect(rollupStatus(["released"])).toBe("released")
+  })
+
+  it("dev when at least one is dev and none are released", () => {
+    expect(rollupStatus(["dev", "none"])).toBe("dev")
+    expect(rollupStatus(["dev"])).toBe("dev")
+  })
+
+  it("none when all are none or list is empty", () => {
+    expect(rollupStatus(["none", "none"])).toBe("none")
+    expect(rollupStatus([])).toBe("none")
   })
 })
 

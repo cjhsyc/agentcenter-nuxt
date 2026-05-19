@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest"
-import { rankFor, toolDisplayBlurb, toolDisplayName, type GroupStats, type ToolDto } from "./mcp-panorama"
+import {
+  mcpDisplayBlurb,
+  mcpDisplayName,
+  rankFor,
+  toolDisplayBlurb,
+  toolDisplayName,
+  type GroupStats,
+  type McpDto,
+  type ToolDto,
+} from "./mcp-panorama"
 
 function stats(released: number, dev: number, none: number): GroupStats {
   const total = released + dev + none
@@ -12,8 +21,26 @@ function stats(released: number, dev: number, none: number): GroupStats {
   }
 }
 
+function mkMcp(over: Partial<McpDto> = {}): McpDto {
+  return {
+    id: 1, slug: "x-mcp", name: "x-mcp", nameZh: null,
+    status: "none", depsCount: 0, blurb: "", blurbZh: "", tags: [],
+    extensionSlug: null, isPlaceholder: false,
+    ...over,
+  }
+}
+
+function mkTool(over: Partial<ToolDto> = {}): ToolDto {
+  return {
+    id: 1, slug: "x", name: "X", nameZh: null, blurb: "", blurbZh: "",
+    ownerPrimary: "x", ownerSecondary: null,
+    mcps: [mkMcp()], rollupStatus: "none",
+    ...over,
+  }
+}
+
 describe("rankFor", () => {
-  it("returns null for groups with fewer than 3 tools", () => {
+  it("returns null for groups with fewer than 3 MCPs", () => {
     expect(rankFor(stats(2, 0, 0))).toBeNull()
     expect(rankFor(stats(0, 0, 2))).toBeNull()
   })
@@ -34,44 +61,30 @@ describe("rankFor", () => {
   })
 
   it("returns early when very low coverage and not lagging", () => {
-    // 4 tools, 0% released, 1 dev, 3 none → not lagging (3/4=75% none>=50% triggers lagging)
-    // build a case: 4 tools, 0 released, 4 dev → lagPct=0, releasedPct=0 → early
     expect(rankFor(stats(0, 4, 0))).toBe("early")
   })
 
   it("returns null in the middling band", () => {
-    // 4 tools, 1 released, 2 dev, 1 none → 25% released, 25% lag → no rank
     expect(rankFor(stats(1, 2, 1))).toBeNull()
   })
 })
 
 describe("toolDisplayName", () => {
-  const tool = (over: Partial<ToolDto> = {}): ToolDto => ({
-    id: 1, slug: "x", name: "EN", nameZh: null, status: "none",
-    depsCount: 0, blurb: "", blurbZh: "", tags: [],
-    extensionSlug: null, ownerPrimary: "x", ownerSecondary: null,
-    ...over,
-  })
-
   it("falls back to English when nameZh is null even in zh locale", () => {
-    expect(toolDisplayName(tool({ name: "IDE" }), "zh")).toBe("IDE")
+    expect(toolDisplayName(mkTool({ name: "IDE" }), "zh")).toBe("IDE")
   })
 
   it("uses nameZh in zh locale when set", () => {
-    expect(toolDisplayName(tool({ name: "5G-Sim", nameZh: "5G 仿真" }), "zh")).toBe("5G 仿真")
+    expect(toolDisplayName(mkTool({ name: "5G-Sim", nameZh: "5G 仿真" }), "zh")).toBe("5G 仿真")
   })
 
   it("uses English in en locale even when nameZh is set", () => {
-    expect(toolDisplayName(tool({ name: "5G-Sim", nameZh: "5G 仿真" }), "en")).toBe("5G-Sim")
+    expect(toolDisplayName(mkTool({ name: "5G-Sim", nameZh: "5G 仿真" }), "en")).toBe("5G-Sim")
   })
 })
 
 describe("toolDisplayBlurb", () => {
-  const tool: ToolDto = {
-    id: 1, slug: "x", name: "X", nameZh: null, status: "none",
-    depsCount: 0, blurb: "english", blurbZh: "中文", tags: [],
-    extensionSlug: null, ownerPrimary: "x", ownerSecondary: null,
-  }
+  const tool = mkTool({ blurb: "english", blurbZh: "中文" })
 
   it("returns english blurb in en locale", () => {
     expect(toolDisplayBlurb(tool, "en")).toBe("english")
@@ -79,5 +92,27 @@ describe("toolDisplayBlurb", () => {
 
   it("returns chinese blurb in zh locale", () => {
     expect(toolDisplayBlurb(tool, "zh")).toBe("中文")
+  })
+})
+
+describe("mcpDisplayName", () => {
+  it("falls back to English when nameZh is null even in zh locale", () => {
+    expect(mcpDisplayName(mkMcp({ name: "codecheck-mcp" }), "zh")).toBe("codecheck-mcp")
+  })
+
+  it("uses nameZh in zh locale when set", () => {
+    expect(mcpDisplayName(mkMcp({ name: "codecheck-mcp", nameZh: "代码检查" }), "zh")).toBe("代码检查")
+  })
+})
+
+describe("mcpDisplayBlurb", () => {
+  const m = mkMcp({ blurb: "english", blurbZh: "中文" })
+
+  it("returns english blurb in en locale", () => {
+    expect(mcpDisplayBlurb(m, "en")).toBe("english")
+  })
+
+  it("returns chinese blurb in zh locale", () => {
+    expect(mcpDisplayBlurb(m, "zh")).toBe("中文")
   })
 })

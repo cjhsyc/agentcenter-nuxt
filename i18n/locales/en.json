@@ -464,8 +464,8 @@
   "mcpPanorama": {
     "page": {
       "title": "MCP Panorama",
-      "subtitleAll": "{visible} of {total} tools in this layer",
-      "subtitleScoped": "{visible} tools · {released} released · {dev} in dev · {none} no MCP needed",
+      "subtitleAll": "{visible} of {total} MCPs in this layer",
+      "subtitleScoped": "{visible} MCPs · {released} released · {dev} in dev · {none} no MCP needed",
       "errorLoad": "Couldn't load the MCP landscape — please retry.",
       "retry": "Retry"
     },
@@ -481,7 +481,7 @@
       "serviceLayer": "Service Layer",
       "sectors": "Sectors",
       "domainsPdts": "Domains / PDTs",
-      "allTools": "All tools",
+      "allMcps": "All MCPs",
       "pushToMcp": "Push to MCP",
       "pushToMcpHint": "Click any card to inspect dependencies & request a build."
     },
@@ -515,7 +515,7 @@
       "noMcp": "No MCP needed",
       "leading": "Leading",
       "lagging": "Lagging",
-      "groupsCount": "{groups} groups · {tools} tools"
+      "groupsCount": "{groups} groups · {mcps} MCPs"
     },
     "card": {
       "live": "live",
@@ -537,7 +537,10 @@
       "lastUpdate": "Last update",
       "owner": "Owner",
       "endpoint": "Endpoint",
-      "downstream": "Downstream tools ({count})",
+      "toolContext": "Tool",
+      "mcp": "MCP",
+      "otherMcps": "Other MCPs in this tool",
+      "downstream": "Downstream MCPs ({count})",
       "empty": "No tracked dependents.",
       "openInMarketplace": "Open in marketplace",
       "trackProgress": "Track progress",
@@ -545,7 +548,8 @@
       "docs": "Docs",
       "close": "Close",
       "notAvailable": "MCP not yet available",
-      "depsCount": "{count} tools"
+      "depsCount": "{count} MCPs",
+      "mcpsCount": "{count} MCPs"
     }
   },
   "time": {

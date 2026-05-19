@@ -464,8 +464,8 @@
   "mcpPanorama": {
     "page": {
       "title": "MCP 全景图",
-      "subtitleAll": "本视图共 {total} 个工具，已显示 {visible} 个",
-      "subtitleScoped": "{visible} 个工具 · {released} 已发布 · {dev} 开发中 · {none} 无需 MCP",
+      "subtitleAll": "本视图共 {total} 个 MCP，已显示 {visible} 个",
+      "subtitleScoped": "{visible} 个 MCP · {released} 已发布 · {dev} 开发中 · {none} 无需 MCP",
       "errorLoad": "加载 MCP 全景失败，请重试。",
       "retry": "重试"
     },
@@ -481,7 +481,7 @@
       "serviceLayer": "服务层级",
       "sectors": "行业",
       "domainsPdts": "领域 / PDT",
-      "allTools": "全部工具",
+      "allMcps": "全部 MCP",
       "pushToMcp": "推动 MCP 化",
       "pushToMcpHint": "点击任意卡片可查看依赖并提交 MCP 化申请。"
     },
@@ -515,7 +515,7 @@
       "noMcp": "无需 MCP",
       "leading": "领先",
       "lagging": "落后",
-      "groupsCount": "{groups} 个分组 · {tools} 个工具"
+      "groupsCount": "{groups} 个分组 · {mcps} 个 MCP"
     },
     "card": {
       "live": "已发布",
@@ -537,7 +537,10 @@
       "lastUpdate": "最近更新",
       "owner": "所属团队",
       "endpoint": "Endpoint",
-      "downstream": "下游工具（共 {count} 个）",
+      "toolContext": "工具",
+      "mcp": "MCP",
+      "otherMcps": "本工具下的其他 MCP",
+      "downstream": "下游 MCP（共 {count} 个）",
       "empty": "暂无跟踪到的依赖方。",
       "openInMarketplace": "在市场中打开",
       "trackProgress": "跟踪进度",
@@ -545,7 +548,8 @@
       "docs": "文档",
       "close": "关闭",
       "notAvailable": "MCP 暂未上线",
-      "depsCount": "{count} 个工具"
+      "depsCount": "{count} 个 MCP",
+      "mcpsCount": "{count} 个 MCP"
     }
   },
   "time": {

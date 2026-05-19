@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import type { McpStatus } from "~~/shared/data/mcp-landscape"
-import type { Group, Layer, LayerPayload, ToolDto } from "~~/shared/mcp-panorama"
+import type {
+  Group,
+  Layer,
+  LayerPayload,
+  McpDto,
+  ToolDto,
+} from "~~/shared/mcp-panorama"
 
 definePageMeta({ layout: "mcp-panorama" })
 
@@ -16,7 +22,7 @@ const activePrimary = ref<string | null>(null)
 const activeSecondary = ref<string | null>(null)
 const statusFilter = ref<"all" | McpStatus>("all")
 const viewMode = ref<"panorama" | "list">("panorama")
-const activeTool = ref<ToolDto | null>(null)
+const active = ref<{ tool: ToolDto; mcp: McpDto } | null>(null)
 
 // Re-fetch when layer changes; everything else filters client-side.
 const { data, pending, error, refresh } = await useFetch<LayerPayload>(
@@ -30,33 +36,50 @@ const { data, pending, error, refresh } = await useFetch<LayerPayload>(
 watch(layer, () => {
   activePrimary.value = null
   activeSecondary.value = null
-  activeTool.value = null
+  active.value = null
 })
 
-// All tools for the current layer (used for derived counts).
-const allTools = computed<ToolDto[]>(() =>
-  data.value ? data.value.groups.flatMap((g) => g.items) : [],
-)
+// All MCPs for the current layer (used for derived counts).
+const allMcps = computed<{ tool: ToolDto; mcp: McpDto }[]>(() => {
+  if (!data.value) return []
+  const out: { tool: ToolDto; mcp: McpDto }[] = []
+  for (const g of data.value.groups) {
+    for (const t of g.items) for (const m of t.mcps) out.push({ tool: t, mcp: m })
+  }
+  return out
+})
 
-// Filter individual tools (drill-down + status).
-function filterTool(tool: ToolDto): boolean {
+function inDrill(tool: ToolDto): boolean {
   if (activePrimary.value && tool.ownerPrimary !== activePrimary.value) return false
   if (activeSecondary.value && tool.ownerSecondary !== activeSecondary.value) return false
-  if (statusFilter.value !== "all" && tool.status !== statusFilter.value) return false
   return true
 }
 
-// Re-shape groups with filtered items, dropping empty groups/PDTs.
+function passesStatus(mcp: McpDto): boolean {
+  return statusFilter.value === "all" || mcp.status === statusFilter.value
+}
+
+// Re-shape groups with filtered MCPs, dropping tools that lose all their MCPs
+// after the status filter, and dropping empty groups/PDTs.
 const filteredGroups = computed<Group[]>(() => {
   if (!data.value) return []
+  function filterTools(tools: ToolDto[]): ToolDto[] {
+    return tools
+      .filter(inDrill)
+      .map((tool) => ({
+        ...tool,
+        mcps: tool.mcps.filter(passesStatus),
+      }))
+      .filter((tool) => tool.mcps.length > 0)
+  }
   return data.value.groups
     .map((g): Group => {
-      const items = g.items.filter(filterTool)
+      const items = filterTools(g.items)
       if (g.kind === "sector") {
         return { ...g, items, stats: computeStats(items) }
       }
       const pdts = g.pdts
-        .map((p) => ({ ...p, items: p.items.filter(filterTool) }))
+        .map((p) => ({ ...p, items: filterTools(p.items) }))
         .filter((p) => p.items.length > 0)
       return { ...g, items, pdts, stats: computeStats(items) }
     })
@@ -65,8 +88,13 @@ const filteredGroups = computed<Group[]>(() => {
 
 function computeStats(items: ToolDto[]) {
   const counts = { released: 0, dev: 0, none: 0 }
-  for (const it of items) counts[it.status]++
-  const total = items.length
+  let total = 0
+  for (const t of items) {
+    for (const m of t.mcps) {
+      counts[m.status]++
+      total++
+    }
+  }
   if (total === 0) {
     return { total, counts, releasedPct: 0, activePct: 0, lagPct: 0 }
   }
@@ -81,14 +109,12 @@ function computeStats(items: ToolDto[]) {
 
 // Visible counts for the section header subtitle and filter chips. These
 // reflect drill-down but ignore the status filter — chips show how many
-// tools each status would surface if selected.
+// MCPs each status would surface if selected.
 const visibleCounts = computed(() => {
   const counts = { released: 0, dev: 0, none: 0, total: 0 }
-  if (!data.value) return counts
-  for (const tool of allTools.value) {
-    if (activePrimary.value && tool.ownerPrimary !== activePrimary.value) continue
-    if (activeSecondary.value && tool.ownerSecondary !== activeSecondary.value) continue
-    counts[tool.status]++
+  for (const { tool, mcp } of allMcps.value) {
+    if (!inDrill(tool)) continue
+    counts[mcp.status]++
     counts.total++
   }
   return counts
@@ -99,7 +125,7 @@ const totals = computed(() => ({ total: data.value?.layerStats.total ?? 0 }))
 function setActive(primary: string | null, secondary: string | null) {
   activePrimary.value = primary
   activeSecondary.value = secondary
-  activeTool.value = null
+  active.value = null
 }
 
 function clearDrill() {
@@ -107,8 +133,8 @@ function clearDrill() {
   activeSecondary.value = null
 }
 
-function pickTool(tool: ToolDto) {
-  activeTool.value = tool
+function pickMcp(payload: { tool: ToolDto; mcp: McpDto }) {
+  active.value = payload
 }
 </script>
 
@@ -170,22 +196,23 @@ function pickTool(tool: ToolDto) {
         ? data.layerStats
         : computeStats(filteredGroups.flatMap((g) => g.items))"
       :groups="filteredGroups"
-      :active-id="activeTool?.id ?? null"
-      @pick="pickTool"
+      :active-mcp-id="active?.mcp.id ?? null"
+      @pick="pickMcp"
     />
     <GroupedListView
       v-else-if="data && viewMode === 'list'"
       :layer="layer"
       :groups="filteredGroups"
-      :active-id="activeTool?.id ?? null"
-      @pick="pickTool"
+      :active-mcp-id="active?.mcp.id ?? null"
+      @pick="pickMcp"
     />
   </div>
 
     <ToolDetailPanel
-      :tool="activeTool"
+      :active="active"
       :groups="data?.groups ?? []"
-      @close="activeTool = null"
+      @close="active = null"
+      @switch-mcp="pickMcp"
     />
   </div>
 </template>

@@ -1,32 +1,42 @@
 <script setup lang="ts">
-import { pdtDisplayTitle, type PdtBlock, type ToolDto } from "~~/shared/mcp-panorama"
-import ToolTile from "./ToolTile.vue"
+import {
+  pdtDisplayTitle,
+  type McpDto,
+  type PdtBlock,
+  type ToolDto,
+} from "~~/shared/mcp-panorama"
+import ToolMcpsCard from "./ToolMcpsCard.vue"
 
 const props = defineProps<{
   pdt: PdtBlock
-  activeId: number | null
+  activeMcpId: number | null
 }>()
-const emit = defineEmits<{ pick: [ToolDto] }>()
+const emit = defineEmits<{ pick: [{ tool: ToolDto; mcp: McpDto }] }>()
 
 const { locale } = useI18n()
 const title = computed(() => pdtDisplayTitle(props.pdt, locale.value))
+
+const mcpCount = computed(() =>
+  props.pdt.items.reduce((acc, t) => acc + t.mcps.length, 0),
+)
 </script>
 
 <template>
-  <div class="bg-(--color-bg) border border-(--color-border) rounded-lg p-2.5 flex flex-col gap-2">
-    <div class="flex items-center justify-between gap-2">
-      <span class="text-[12px] font-semibold text-(--color-ink) tracking-tight">{{ title }}</span>
-      <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ pdt.items.length }}</span>
-    </div>
-    <div class="flex flex-wrap gap-1">
-      <ToolTile
+  <section class="bg-(--color-bg) rounded-lg px-2.5 py-2.5 flex flex-col gap-2">
+    <header class="flex items-baseline justify-between gap-2 px-0.5">
+      <span class="font-serif text-[13px] font-medium text-(--color-ink) tracking-tight truncate">
+        {{ title }}
+      </span>
+      <span class="font-mono text-[10px] text-(--color-ink-muted) shrink-0">{{ mcpCount }}</span>
+    </header>
+    <div class="flex flex-col gap-1.5">
+      <ToolMcpsCard
         v-for="tool in pdt.items"
         :key="tool.id"
         :tool="tool"
-        :active="activeId === tool.id"
-        compact
-        @pick="(t) => emit('pick', t)"
+        :active-mcp-id="activeMcpId"
+        @pick="(p) => emit('pick', p)"
       />
     </div>
-  </div>
+  </section>
 </template>

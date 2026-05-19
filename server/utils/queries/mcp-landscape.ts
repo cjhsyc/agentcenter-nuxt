@@ -1,10 +1,15 @@
-import { asc, eq, isNotNull } from "drizzle-orm"
+import { asc, eq, inArray, isNotNull } from "drizzle-orm"
 
 import { useDb } from "~~/server/utils/db"
-import { deriveStatus, type McpStatus } from "~~/shared/data/mcp-landscape"
+import {
+  deriveStatus,
+  rollupStatus,
+  type McpStatus,
+} from "~~/shared/data/mcp-landscape"
 import {
   extensions,
   mcpDomains,
+  mcpLandscapeMcps,
   mcpLandscapeTools,
   mcpPdts,
   mcpSectors,
@@ -15,6 +20,7 @@ import type {
   GroupStats,
   Layer,
   LayerPayload,
+  McpDto,
   PdtBlock,
   SectorGroup,
   StatusCounts,
@@ -27,6 +33,7 @@ export type {
   GroupStats,
   Layer,
   LayerPayload,
+  McpDto,
   PdtBlock,
   SectorGroup,
   StatusCounts,
@@ -37,10 +44,16 @@ function blankCounts(): StatusCounts {
   return { released: 0, dev: 0, none: 0 }
 }
 
-function computeStats(items: { status: McpStatus }[]): GroupStats {
+/** Counts are over **MCPs** (the leaf tile entity), not tools. */
+function computeStats(tools: ToolDto[]): GroupStats {
   const counts = blankCounts()
-  for (const item of items) counts[item.status]++
-  const total = items.length
+  let total = 0
+  for (const t of tools) {
+    for (const m of t.mcps) {
+      counts[m.status]++
+      total++
+    }
+  }
   if (total === 0) {
     return { total, counts, releasedPct: 0, activePct: 0, lagPct: 0 }
   }
@@ -53,10 +66,35 @@ function computeStats(items: { status: McpStatus }[]): GroupStats {
   }
 }
 
+/** Synthesize a single "none"-status placeholder MCP so a tool with zero
+ * real MCPs still renders a tile. The id is negative to mark it as virtual
+ * and to avoid colliding with real `mcp_landscape_mcps.id` values. */
+function placeholderMcp(tool: {
+  id: number
+  slug: string
+  name: string
+  nameZh: string | null
+  blurb: string
+  blurbZh: string
+}): McpDto {
+  return {
+    id: -tool.id,
+    slug: tool.slug,
+    name: tool.name,
+    nameZh: tool.nameZh,
+    status: "none",
+    depsCount: 0,
+    blurb: tool.blurb,
+    blurbZh: tool.blurbZh,
+    tags: [],
+    extensionSlug: null,
+    isPlaceholder: true,
+  }
+}
+
 export async function getLandscape(layer: Layer): Promise<LayerPayload> {
   const db = useDb()
-  // One join across the four tables; pgsql returns ordered rows.
-  const rows = await db
+  const toolRows = await db
     .select({
       id: mcpLandscapeTools.id,
       slug: mcpLandscapeTools.slug,
@@ -64,27 +102,47 @@ export async function getLandscape(layer: Layer): Promise<LayerPayload> {
       nameZh: mcpLandscapeTools.nameZh,
       blurb: mcpLandscapeTools.blurb,
       blurbZh: mcpLandscapeTools.blurbZh,
-      tags: mcpLandscapeTools.tags,
-      depsCount: mcpLandscapeTools.depsCount,
-      extensionId: mcpLandscapeTools.extensionId,
-      inDev: mcpLandscapeTools.inDev,
       ownerSector: mcpLandscapeTools.ownerSector,
       ownerDomain: mcpLandscapeTools.ownerDomain,
       ownerPdt: mcpLandscapeTools.ownerPdt,
-      extensionSlug: extensions.slug,
     })
     .from(mcpLandscapeTools)
-    .leftJoin(extensions, eq(mcpLandscapeTools.extensionId, extensions.id))
     .where(eq(mcpLandscapeTools.layer, layer))
     .orderBy(asc(mcpLandscapeTools.id))
 
-  const tools: ToolDto[] = rows.map((r) => {
+  const toolIds = toolRows.map((t) => t.id)
+  const mcpRows = toolIds.length === 0
+    ? []
+    : await db
+        .select({
+          id: mcpLandscapeMcps.id,
+          toolId: mcpLandscapeMcps.toolId,
+          slug: mcpLandscapeMcps.slug,
+          name: mcpLandscapeMcps.name,
+          nameZh: mcpLandscapeMcps.nameZh,
+          extensionId: mcpLandscapeMcps.extensionId,
+          inDev: mcpLandscapeMcps.inDev,
+          depsCount: mcpLandscapeMcps.depsCount,
+          blurb: mcpLandscapeMcps.blurb,
+          blurbZh: mcpLandscapeMcps.blurbZh,
+          tags: mcpLandscapeMcps.tags,
+          extensionSlug: extensions.slug,
+        })
+        .from(mcpLandscapeMcps)
+        .leftJoin(extensions, eq(mcpLandscapeMcps.extensionId, extensions.id))
+        .where(inArray(mcpLandscapeMcps.toolId, toolIds))
+        .orderBy(
+          asc(mcpLandscapeMcps.toolId),
+          asc(mcpLandscapeMcps.sortOrder),
+        )
+
+  const mcpsByToolId = new Map<number, McpDto[]>()
+  for (const r of mcpRows) {
     const status = deriveStatus({
       extensionId: r.extensionId,
       inDev: r.inDev,
     })
-    const ownerPrimary = layer === "industry" ? r.ownerSector! : r.ownerDomain!
-    return {
+    const dto: McpDto = {
       id: r.id,
       slug: r.slug,
       name: r.name,
@@ -95,8 +153,28 @@ export async function getLandscape(layer: Layer): Promise<LayerPayload> {
       blurbZh: r.blurbZh,
       tags: r.tags,
       extensionSlug: status === "released" ? r.extensionSlug : null,
+      isPlaceholder: false,
+    }
+    const bucket = mcpsByToolId.get(r.toolId)
+    if (bucket) bucket.push(dto)
+    else mcpsByToolId.set(r.toolId, [dto])
+  }
+
+  const tools: ToolDto[] = toolRows.map((r) => {
+    const real = mcpsByToolId.get(r.id) ?? []
+    const mcps = real.length > 0 ? real : [placeholderMcp(r)]
+    const ownerPrimary = layer === "industry" ? r.ownerSector! : r.ownerDomain!
+    return {
+      id: r.id,
+      slug: r.slug,
+      name: r.name,
+      nameZh: r.nameZh,
+      blurb: r.blurb,
+      blurbZh: r.blurbZh,
       ownerPrimary,
       ownerSecondary: r.ownerPdt,
+      mcps,
+      rollupStatus: rollupStatus(mcps.map((m) => m.status)),
     }
   })
 
@@ -161,3 +239,6 @@ export async function getLandscape(layer: Layer): Promise<LayerPayload> {
 
   return { layer, layerStats, groups }
 }
+
+// Used by McpStatus consumers; re-exported for ergonomic imports.
+export type { McpStatus }

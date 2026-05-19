@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import type { SectorGroup, ToolDto } from "~~/shared/mcp-panorama"
+import type { McpDto, SectorGroup, ToolDto } from "~~/shared/mcp-panorama"
 import CardHeader from "./CardHeader.vue"
-import ToolTile from "./ToolTile.vue"
+import ToolMcpsCard from "./ToolMcpsCard.vue"
 
 defineProps<{
   group: SectorGroup
-  activeId: number | null
+  activeMcpId: number | null
 }>()
-const emit = defineEmits<{ pick: [ToolDto] }>()
+const emit = defineEmits<{ pick: [{ tool: ToolDto; mcp: McpDto }] }>()
 </script>
 
 <template>
   <article class="bg-(--color-card) border border-(--color-border) rounded-xl p-3.5 flex flex-col gap-3">
     <CardHeader :group="group" />
-    <div class="flex flex-wrap gap-1.5">
-      <ToolTile
+    <div class="bg-(--color-bg) rounded-lg p-2.5 flex flex-col gap-1.5">
+      <ToolMcpsCard
         v-for="tool in group.items"
         :key="tool.id"
         :tool="tool"
-        :active="activeId === tool.id"
-        @pick="(t) => emit('pick', t)"
+        :active-mcp-id="activeMcpId"
+        @pick="(p) => emit('pick', p)"
       />
     </div>
   </article>
