@@ -15,19 +15,17 @@ const props = defineProps<{
 
 const { locale, t } = useI18n()
 
-const ranked = computed(() =>
-  [...props.groups].sort((a, b) => b.stats.releasedPct - a.stats.releasedPct),
+const top3 = computed(() =>
+  [...props.groups]
+    .filter((g) => g.stats.total > 0)
+    .sort((a, b) => b.stats.releasedPct - a.stats.releasedPct)
+    .slice(0, 3),
 )
-const top = computed(() => ranked.value[0] ?? null)
-const bot = computed(() => {
-  const last = ranked.value[ranked.value.length - 1]
-  return last && last.key !== top.value?.key ? last : null
-})
 
 const layerLabel = computed(() => t(`mcpPanorama.layer.${props.layer}Short`))
 
-function title(g: Group | null): string {
-  return g ? groupDisplayTitle(g, locale.value) : ""
+function title(g: Group): string {
+  return groupDisplayTitle(g, locale.value)
 }
 </script>
 
@@ -121,25 +119,26 @@ function title(g: Group | null): string {
       </span>
     </div>
 
-    <!-- Leading / Lagging -->
-    <div class="px-5 py-4 border-l border-(--color-border) bg-(--color-bg) flex flex-col gap-2.5">
-      <div v-if="top" class="flex flex-col gap-0.5">
-        <span class="font-mono text-[10px] tracking-wider uppercase text-(--color-ink-muted)">
-          {{ t("mcpPanorama.summary.leading") }}
-        </span>
-        <span class="text-[14px] text-(--color-ink) font-medium">
-          {{ title(top) }}
-          <span class="font-mono text-[12px] text-(--color-status-released)">{{ top.stats.releasedPct }}%</span>
-        </span>
-      </div>
-      <div v-if="bot" class="flex flex-col gap-0.5">
-        <span class="font-mono text-[10px] tracking-wider uppercase text-(--color-ink-muted)">
-          {{ t("mcpPanorama.summary.lagging") }}
-        </span>
-        <span class="text-[14px] text-(--color-ink) font-medium">
-          {{ title(bot) }}
-          <span class="font-mono text-[12px] text-(--color-status-none)">{{ bot.stats.releasedPct }}%</span>
-        </span>
+    <!-- Top by release % -->
+    <div class="px-5 py-4 border-l border-(--color-border) bg-(--color-bg) flex flex-col gap-1.5">
+      <span class="font-mono text-[10px] tracking-wider uppercase text-(--color-ink-muted)">
+        {{ t("mcpPanorama.summary.topReleased") }}
+      </span>
+      <div v-if="top3.length === 0" class="text-[12px] text-(--color-ink-muted) italic">—</div>
+      <div v-else class="flex flex-col gap-1">
+        <div
+          v-for="(g, i) in top3"
+          :key="g.key"
+          class="flex items-baseline justify-between gap-2"
+        >
+          <span class="text-[13px] text-(--color-ink) truncate">
+            <span class="font-mono text-[10px] text-(--color-ink-muted) mr-1.5">#{{ i + 1 }}</span>
+            {{ title(g) }}
+          </span>
+          <span class="font-mono text-[12px] text-(--color-status-released) tabular-nums shrink-0">
+            {{ g.stats.releasedPct }}%
+          </span>
+        </div>
       </div>
     </div>
   </section>
