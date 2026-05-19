@@ -40,15 +40,17 @@ Source-of-truth list of what's shipped today, organized by capability area. For 
 
 ### MCP Panorama
 
-- **Landscape page** — A single page at `/mcp-panorama` that maps every internal tool service to a color-coded tile, so the company-wide MCP adoption picture fits on one screen.
+- **Landscape page** — A single page at `/mcp-panorama` that maps every internal tool service onto one screen as a small card, grouped by industry sector or by public-services domain → PDT.
+- **A software tool can ship multiple MCPs** — A tool may expose any number of MCP servers (CodeCheck ships two; K8sOps and ObservHub each ship three). Each MCP carries its own status, dependent count, and marketplace link.
 - **Layer toggle** — Switch between Industry Services (12 sectors) and Public Services (5 domains with their product development teams).
-- **Coverage at a glance** — Each group shows a status bar, live counts, and a Leading / On track / Lagging / Early tag so it's obvious which units are ahead and which are behind.
-- **Status filter chips** — Show only released, only in-development, or only no-MCP-needed tools.
-- **Search across the landscape** — Find any tool by name, blurb, or tag.
-- **Drill into a sector or PDT** — Click any row in the layer sidebar to scope the view to one group.
-- **Two layouts** — A compact Panorama tile view and an alternate Grouped List that splits each group into three status columns.
-- **Tool side panel** — Click any tile to see its status description, dependent count, owning team, and downstream tools. Released tools link to the marketplace; in-development tools offer "Track progress"; tools without an MCP plan offer "Request MCP build".
-- **Bilingual** — Sectors, domains, PDTs, statuses, and tool descriptions all render in EN or ZH.
+- **Tool-as-card layout** — Each software tool reads as a small quiet card with a serif name; the MCP servers inside render as vivid status-coloured pills. PDTs sit as subtly recessed regions for clear visual hierarchy.
+- **Coverage at a glance** — Each group's header shows the total count and a "released/total" fraction with a thin stacked status bar. The layer summary's right block ranks the top three groups by release %.
+- **Status filter chips** — Show only released, only in-development, or only no-MCP-needed MCPs.
+- **Clickable stats** — Every count on the page doubles as an action: click a card title to drill into the group, click a status total to flip the page filter (and again to flip back), click a top-three entry to jump straight there.
+- **Drill into a sector or PDT** — Click any row in the layer sidebar, any card title, or any top-three ranking entry to scope the view to one group.
+- **Two layouts** — A compact Panorama view and an alternate Grouped List that splits each group into three status columns.
+- **MCP detail panel** — Click any pill to see the MCP's status, dependent count, owning team, endpoint, and tags. The panel also lists sibling MCPs of the same tool, so you can switch between them in one click. Released MCPs offer a "Copy MCP URI" button and a direct link to the marketplace listing; in-development MCPs offer "Track progress"; tools without an MCP offer "Request MCP build".
+- **Bilingual** — Sectors, domains, PDTs, statuses, tool names, and MCP descriptions all render in EN or ZH.
 - **Catalog cross-link** — Filtering the extensions catalog to MCP Servers surfaces a "View Panorama" banner above the grid; MCP Panorama also lives inside the Explore dropdown in the top nav, next to the type filters.
 
 ### Publish
@@ -145,15 +147,17 @@ Source-of-truth list of what's shipped today, organized by capability area. For 
 
 ### MCP 全景图
 
-- **全景页** ——单页 `/mcp-panorama` 将所有内部工具服务以色块呈现，整个公司的 MCP 化全貌一屏可见。
+- **全景页** ——单页 `/mcp-panorama` 将所有内部工具服务以小卡片形式整屏呈现，按行业切片或公共服务领域 → PDT 分组归类。
+- **一个软件工具可承载多个 MCP** ——一个工具可以承载任意数量的 MCP 服务器（CodeCheck 承载两个；K8sOps 与 ObservHub 各自承载三个）。每个 MCP 都拥有独立的状态、依赖方数量与市场链接。
 - **层级切换** ——可在"行业服务"（12 个行业切片）与"公共服务"（5 个公共领域及其下属 PDT）之间切换。
-- **覆盖率一目了然** ——每个分组带状态进度条、各状态数量与"领先 / 进展中 / 落后 / 起步"标签，先进与落后单位一目了然。
-- **状态筛选** ——可单独查看"已发布"、"开发中"或"无需 MCP"的工具。
-- **跨全景搜索** ——按名称、简介或标签查找任意工具。
-- **下钻到行业或 PDT** ——点击层级侧栏任意一行即可将视图收窄到该分组。
-- **两种排版** ——紧凑的"全景图"瓦片视图，以及按"已发布 / 开发中 / 无需"三列拆分的"分组列表"备用视图。
-- **工具详情面板** ——点击任意色块查看状态说明、依赖方数量、所属团队与下游工具。已发布工具跳转到市场详情；开发中工具提供"跟踪进度"；无 MCP 计划的工具提供"申请 MCP 化"。
-- **双语呈现** ——行业、领域、PDT、状态、工具描述均支持中英双语。
+- **工具卡 + MCP 胶囊的排版** ——每个软件工具以一张安静的小卡片呈现，标题用衬线字；其下属的 MCP 服务器在卡内以醒目的状态色胶囊呈现。PDT 退化为微微凹陷的容器，版面层次清晰。
+- **覆盖率一目了然** ——每个分组的标题区展示总数与"已发布/总数"分数，配一条细分状态条；摘要区右栏按发布率列出排名前三的分组。
+- **状态筛选** ——可单独查看"已发布"、"开发中"或"无需 MCP"的 MCP。
+- **数字均可点击** ——页面上的每一个计数都是一个操作入口：点击分组标题下钻；点击状态总数翻转页面筛选（再次点击则恢复）；点击排名前三的任意条目即可直跳该分组。
+- **下钻到行业或 PDT** ——点击层级侧栏任意一行、任意分组标题或排名前三任意一条，均可将视图收窄到该分组。
+- **两种排版** ——紧凑的"全景图"视图，以及按"已发布 / 开发中 / 无需"三列拆分的"分组列表"备用视图。
+- **MCP 详情面板** ——点击任意胶囊即可查看该 MCP 的状态说明、依赖方数量、所属团队、endpoint 与标签。面板同时列出同一工具下的其他 MCP，可一键切换。已发布 MCP 提供"复制 MCP URI"按钮与直达市场详情的链接；开发中的 MCP 提供"跟踪进度"；尚无 MCP 的工具提供"申请 MCP 化"。
+- **双语呈现** ——行业、领域、PDT、状态、工具名与 MCP 描述均支持中英双语。
 - **目录交叉入口** ——在扩展目录筛选"MCP"分类时，列表上方会出现"查看全景图"横幅；MCP 全景图同时位于顶部导航的 Explore 下拉菜单中，与类型筛选并列。
 
 ### 发布

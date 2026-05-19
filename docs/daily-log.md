@@ -12,6 +12,29 @@ What changed each day. For the current capability list, see [features.md](./feat
 
 ## English
 
+### 2026-05-19
+
+**Briefing.** Today's release reshapes the MCP Panorama around realistic multi-MCP tools — a software tool can now expose several MCP servers — and strips editorial labels from every group's stats in favour of the raw numbers, all of which double as one-click drill and filter actions.
+
+<details>
+<summary>Details</summary>
+
+- **A software tool can ship multiple MCPs** — A tool no longer collapses to one MCP listing. CodeCheck now exposes both codecheck-mcp and molint-mcp; K8sOps and ObservHub each ship three. The detail panel adds an "Other MCPs in this tool" switcher so you can jump between sibling MCPs without closing the panel. (#24)
+
+- **A more realistic MCP inventory** — Every MCP carries a descriptive name (kubectl-mcp, helm-mcp, metrics-mcp, identity-mcp, …) instead of a generic "tool-name-mcp" placeholder. The pool of "no MCP needed" tools shrinks from 19 to 6 truly legacy or manual workflows, so the panorama reflects an organization that actually ships MCPs. (#24)
+
+- **Tool-as-card layout** — Each software tool reads as a small quiet card with a serif name and a small status dot; its MCP servers render inside as vivid status-coloured pills. PDTs become subtly recessed regions, giving the page a clear hierarchy: domain → recessed PDT → raised tool card → vivid MCP pills. (#24)
+
+- **Raw numbers replace ranking labels** — Group headers no longer carry a "Leading / On track / Lagging" verdict pill. Each shows the underlying numbers — total count, a "5/8 released" fraction, and a thin stacked status bar. The summary's right block lists the top three groups by release %, ranked numerically, instead of singling out one "Leading" name. (#25)
+
+- **Every count is now clickable** — Numbers on the page double as actions. Click a group's title to drill in; click "Released 87" to flip the status filter to released (and again to flip back to all); click a top-three entry to jump straight there. (#25)
+
+- **Developer ergonomics in the detail panel** — A copy-MCP-URI button sits next to the endpoint for released MCPs, with a check-icon confirmation. The MCP's tags surface as small chips above the metadata grid, so you can see at a glance what an MCP covers. (#25)
+
+</details>
+
+---
+
 ### 2026-05-18
 
 **Briefing.** Today's release pivots browsing toward type-first navigation, gives the home page a real curated "Featured this week" spotlight, and adds a Mono Clean theme alongside Ivory and Dark.
@@ -78,6 +101,29 @@ What changed each day. For the current capability list, see [features.md](./feat
 ---
 
 ## 中文
+
+### 2026-05-19
+
+**简报。** 今日发布围绕"一个软件工具可承载多个 MCP 服务"重构 MCP 全景图，并把每个分组上的"领先 / 落后"评级标签替换为可读的原始数字——而每一个数字本身又都成了可点击的下钻或筛选动作。
+
+<details>
+<summary>详情</summary>
+
+- **一个软件工具可承载多个 MCP** ——工具不再被强行收敛为单一 MCP。CodeCheck 现在同时承载 codecheck-mcp 与 molint-mcp；K8sOps 与 ObservHub 各自承载三个。详情面板新增"本工具下的其他 MCP"切换器，可在同一工具的多个 MCP 之间快速跳转，无需关闭面板。（#24）
+
+- **更真实的 MCP 清单** ——每个 MCP 都使用具描述性的名字（kubectl-mcp、helm-mcp、metrics-mcp、identity-mcp 等）取代通用的"工具名-mcp"占位。"无需 MCP"的工具数量从 19 个收缩到 6 个真正属于遗留或手工流程的工具——全景图终于更像一个真实在推进 MCP 化的组织。（#24）
+
+- **工具卡 + MCP 胶囊的新排版** ——每个软件工具以一张安静的小卡片呈现，卡片标题用衬线字配以一个小小的汇总状态点；其下属的 MCP 服务器在卡内以醒目的状态色胶囊呈现。PDT 退化为微微凹陷的容器——版面层次自上而下一目了然：领域 → 凹陷的 PDT → 凸起的工具卡 → 醒目的 MCP 胶囊。（#24）
+
+- **用原始数字取代评级标签** ——分组标题不再挂"领先 / 进展中 / 落后"评级胶囊。每个分组直接展示数字本身——总数、"5/8 已发布"分数，以及一条细分状态条。摘要区右栏不再单独点名一个"领先"分组，而是按发布率列出排名前三。（#25）
+
+- **页面上的数字均可点击** ——页面上的每一个计数都成为可操作的入口。点击分组标题即下钻；点击"已发布 87"翻转状态筛选至"仅已发布"（再次点击则恢复"全部"）；点击排名前三的任意条目即可直跳该分组。（#25）
+
+- **详情面板的开发者细节** ——已发布的 MCP 在 endpoint 旁新增一键复制按钮，复制成功后图标切到对勾示意。MCP 的标签以小标签形式呈现于元数据上方，无需离开面板即可了解 MCP 的覆盖范围。（#25）
+
+</details>
+
+---
 
 ### 2026-05-18
 
