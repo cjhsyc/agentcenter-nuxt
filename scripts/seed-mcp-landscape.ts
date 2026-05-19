@@ -12,7 +12,7 @@
 // Also imported by scripts/seed.ts so the demo seed and the standalone
 // seed share one source of truth.
 
-import { sql } from "drizzle-orm"
+import { and, notInArray, sql } from "drizzle-orm"
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
 
@@ -133,9 +133,11 @@ export async function seedMcpLandscape(db: Db): Promise<void> {
       .filter((m) => m.released)
       .map((m) => ({ tool: t, mcp: m })),
   )
-  const mcpExtRows = releasedMcpRows.map(({ tool: t, mcp: m }) => {
-    const name = m.name ?? t.name
-    const nameZh = m.nameZh ?? t.nameZh ?? null
+  const mcpExtRows = releasedMcpRows.map(({ mcp: m }) => {
+    // MCPs are identified by their slug — that's the canonical display label
+    // across the marketplace listing, the panorama tile, and the detail panel.
+    const name = m.name ?? m.slug
+    const nameZh = m.nameZh ?? null
     return {
       id: `mcp-${m.slug}`,
       slug: m.slug,
@@ -235,8 +237,8 @@ export async function seedMcpLandscape(db: Db): Promise<void> {
     return t.mcps.map((m, i) => ({
       toolId,
       slug: m.slug,
-      name: m.name ?? t.name,
-      nameZh: m.nameZh ?? t.nameZh ?? null,
+      name: m.name ?? m.slug,
+      nameZh: m.nameZh ?? null,
       extensionId: m.released ? `mcp-${m.slug}` : null,
       inDev: m.inDev,
       depsCount: m.depsCount,
@@ -246,6 +248,39 @@ export async function seedMcpLandscape(db: Db): Promise<void> {
       sortOrder: i,
     }))
   })
+  // Prune MCPs whose slug is no longer in the canonical inventory — covers
+  // the case where the seed renames or removes an MCP between deploys. We
+  // do this BEFORE the upsert so the FK from extensions stays consistent;
+  // mcps with extensionId set to a stub we're about to drop will null out
+  // via the existing `onDelete: 'set null'` rule on the FK.
+  const desiredMcpSlugs = mcpRows.map((r) => r.slug)
+  if (desiredMcpSlugs.length > 0) {
+    const stale = await db
+      .delete(mcpLandscapeMcps)
+      .where(notInArray(mcpLandscapeMcps.slug, desiredMcpSlugs))
+      .returning({ slug: mcpLandscapeMcps.slug })
+    if (stale.length > 0) {
+      console.log(`seed-mcp: pruned ${stale.length} stale MCPs (${stale.map((s) => s.slug).join(", ")})`)
+    }
+  }
+
+  // Same cleanup for marketplace extension stubs the seed owns
+  // (id prefix `mcp-`). Extensions never seeded by this file (real publisher
+  // listings) keep their own ids and are untouched.
+  const desiredExtIds = mcpExtRows.map((r) => r.id)
+  const staleExts = await db
+    .delete(extensions)
+    .where(and(
+      sql`${extensions.id} LIKE 'mcp-%'`,
+      desiredExtIds.length > 0
+        ? notInArray(extensions.id, desiredExtIds)
+        : sql`true`,
+    ))
+    .returning({ id: extensions.id })
+  if (staleExts.length > 0) {
+    console.log(`seed-mcp: pruned ${staleExts.length} stale extension stubs (${staleExts.map((s) => s.id).join(", ")})`)
+  }
+
   console.log(`seed-mcp: upserting ${mcpRows.length} landscape MCPs`)
   if (mcpRows.length > 0) {
     await db

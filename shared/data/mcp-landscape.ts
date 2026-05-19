@@ -44,7 +44,7 @@ export interface McpPdtSeed {
 export interface McpSeed {
   /** Marketplace-wide MCP slug, e.g. "codecheck-mcp" or "molint-mcp". */
   slug: string
-  /** Optional explicit display name; defaults to the parent tool's name at seed time. */
+  /** Optional explicit display name; defaults to the slug at seed time. */
   name?: string
   nameZh?: string
   released: boolean
@@ -209,27 +209,35 @@ function mcp(
   }
 }
 
-/** Convenience: a tool with a single MCP whose slug is `<tool-slug>-mcp` and
- * which inherits the tool's blurb/name. Most tools use this shape; multi-MCP
- * tools (like CodeCheck) call `tool(...)` with an explicit mcps[] instead. */
-function singleMcpTool(
+/** Convenience: a tool with a single MCP, slug explicit so it can describe
+ * what the MCP exposes (`bgp-policy-mcp`, not `routeforge-mcp`). The MCP
+ * inherits the tool's blurb by default. Multi-MCP tools call `tool(...)`
+ * with an explicit mcps[] instead. */
+function oneMcpTool(
   name: string,
   owner: string,
-  status: McpStatus,
-  depsCount: number,
   blurb: string,
   blurbZh: string,
+  mcpSlug: string,
+  status: McpStatus,
+  depsCount: number,
   tags: string[],
-  opts: { nameZh?: string } = {},
+  opts: { nameZh?: string; mcpBlurb?: string; mcpBlurbZh?: string } = {},
 ): McpToolSeed {
-  const slug = toSlug(name)
   return tool(name, owner, blurb, blurbZh, [
-    mcp(`${slug}-mcp`, status, depsCount, blurb, blurbZh, tags),
-  ], opts)
+    mcp(
+      mcpSlug,
+      status,
+      depsCount,
+      opts.mcpBlurb ?? blurb,
+      opts.mcpBlurbZh ?? blurbZh,
+      tags,
+    ),
+  ], { nameZh: opts.nameZh })
 }
 
 /** Convenience: a tool with **no** MCPs yet — renders a single placeholder
- * tile. Used for "none"-status tools so they still appear in the panorama. */
+ * tile. Used for legacy / manual-workflow tools that truly don't need one. */
 function noMcpTool(
   name: string,
   owner: string,
@@ -242,176 +250,239 @@ function noMcpTool(
 
 export const MCP_TOOLS: McpToolSeed[] = [
   // ── Industry · Wireless ─────────────────────────────────────────
-  singleMcpTool("5G-Sim", "wireless", "released", 12, "End-to-end 5G NR link simulator", "端到端 5G NR 链路仿真器", ["sim", "rf"]),
-  singleMcpTool("RadioPlan", "wireless", "released", 7, "Cell planning + propagation maps", "小区规划与传播图", ["planning", "gis"]),
-  singleMcpTool("SpectrumMgr", "wireless", "dev", 4, "Spectrum allocation & interference", "频谱分配与干扰分析", ["spectrum"]),
-  singleMcpTool("BeamOpt", "wireless", "dev", 3, "Massive-MIMO beam optimizer", "大规模 MIMO 波束优化器", ["mimo", "optim"]),
+  oneMcpTool("5G-Sim", "wireless", "End-to-end 5G NR link simulator", "端到端 5G NR 链路仿真器", "linksim-mcp", "released", 12, ["sim", "rf"]),
+  oneMcpTool("RadioPlan", "wireless", "Cell planning + propagation maps", "小区规划与传播图", "propmap-mcp", "released", 7, ["planning", "gis"]),
+  oneMcpTool("SpectrumMgr", "wireless", "Spectrum allocation & interference", "频谱分配与干扰分析", "spectrum-mcp", "dev", 4, ["spectrum"]),
+  oneMcpTool("BeamOpt", "wireless", "Massive-MIMO beam optimizer", "大规模 MIMO 波束优化器", "beamform-mcp", "dev", 3, ["mimo", "optim"]),
   noMcpTool("AntennaCAD", "wireless", "Antenna 3D modeling suite", "天线三维建模套件"),
-  singleMcpTool("RANConfig", "wireless", "released", 9, "RAN parameter rollout & rollback", "RAN 参数发布与回滚", ["config", "ran"]),
-  noMcpTool("FieldTest", "wireless", "On-site drive-test recorder", "现场路测记录工具"),
+  // RANConfig splits rollout and rollback into separate MCPs — common pattern
+  // where dangerous operations get an isolated surface for safer agent use.
+  tool("RANConfig", "wireless", "RAN parameter rollout & rollback", "RAN 参数发布与回滚", [
+    mcp("ran-config-mcp", "released", 6, "Author and push RAN parameter sets", "编辑并下发 RAN 参数", ["config", "ran"]),
+    mcp("ran-rollback-mcp", "released", 3, "Targeted RAN parameter rollback", "RAN 参数定向回滚", ["rollback", "ran"]),
+  ]),
+  oneMcpTool("FieldTest", "wireless", "On-site drive-test recorder", "现场路测记录工具", "drive-test-mcp", "dev", 1, ["field"]),
 
   // ── Industry · Datacom ─────────────────────────────────────────
-  singleMcpTool("RouteForge", "datacom", "released", 14, "BGP/OSPF policy author + simulator", "BGP/OSPF 策略编辑与仿真", ["routing"]),
-  singleMcpTool("PacketLens", "datacom", "released", 8, "Distributed packet capture & search", "分布式抓包与检索", ["pcap"]),
-  singleMcpTool("ConfigPilot", "datacom", "dev", 11, "Multi-vendor device config diff & deploy", "多厂家设备配置对比与下发", ["config"]),
-  singleMcpTool("TopoMap", "datacom", "dev", 5, "Live L2/L3 topology graph", "实时 L2/L3 拓扑图", ["graph"]),
-  noMcpTool("NetSim", "datacom", "Discrete-event network simulator", "离散事件网络仿真器"),
+  tool("RouteForge", "datacom", "BGP/OSPF policy author + simulator", "BGP/OSPF 策略编辑与仿真", [
+    mcp("bgp-policy-mcp", "released", 9, "BGP policy editor + diff", "BGP 策略编辑与对比", ["routing", "bgp"]),
+    mcp("ospf-mcp", "released", 5, "OSPF area + cost simulation", "OSPF 区域与代价仿真", ["routing", "ospf"]),
+  ]),
+  oneMcpTool("PacketLens", "datacom", "Distributed packet capture & search", "分布式抓包与检索", "pcap-search-mcp", "released", 8, ["pcap"]),
+  oneMcpTool("ConfigPilot", "datacom", "Multi-vendor device config diff & deploy", "多厂家设备配置对比与下发", "device-config-mcp", "dev", 11, ["config"]),
+  oneMcpTool("TopoMap", "datacom", "Live L2/L3 topology graph", "实时 L2/L3 拓扑图", "topo-graph-mcp", "dev", 5, ["graph"]),
+  oneMcpTool("NetSim", "datacom", "Discrete-event network simulator", "离散事件网络仿真器", "netsim-mcp", "dev", 3, ["sim"]),
 
   // ── Industry · Cloud ───────────────────────────────────────────
-  singleMcpTool("K8sOps", "cloud", "released", 22, "Cluster lifecycle + GitOps", "集群生命周期与 GitOps", ["k8s", "gitops"]),
-  singleMcpTool("ServiceMesh", "cloud", "released", 16, "Mesh policy + mTLS console", "服务网格策略与 mTLS 控制台", ["mesh"]),
-  singleMcpTool("CostExplorer", "cloud", "released", 4, "Multi-cloud spend attribution", "多云成本分摊", ["finops"]),
-  singleMcpTool("CloudAudit", "cloud", "dev", 9, "Continuous compliance evidence", "持续合规证据采集", ["security"]),
-  singleMcpTool("MultiCloud", "cloud", "dev", 6, "Cross-provider workload mover", "跨云负载迁移", ["multi"]),
-  noMcpTool("EdgeProvision", "cloud", "Edge node bring-up automation", "边缘节点开通自动化"),
+  // K8sOps is a 3-MCP showcase: imperative kubectl, declarative helm, gitops.
+  tool("K8sOps", "cloud", "Cluster lifecycle + GitOps", "集群生命周期与 GitOps", [
+    mcp("kubectl-mcp", "released", 12, "Imperative cluster operations", "命令式集群操作", ["k8s"]),
+    mcp("helm-mcp", "released", 7, "Helm chart install + diff", "Helm Chart 安装与对比", ["k8s", "helm"]),
+    mcp("gitops-mcp", "dev", 3, "ArgoCD-style declarative sync", "ArgoCD 风格声明式同步", ["gitops"]),
+  ]),
+  tool("ServiceMesh", "cloud", "Mesh policy + mTLS console", "服务网格策略与 mTLS 控制台", [
+    mcp("mesh-policy-mcp", "released", 10, "Traffic + auth policy editor", "流量与鉴权策略编辑", ["mesh"]),
+    mcp("mtls-mcp", "released", 6, "mTLS cert rotation", "mTLS 证书轮换", ["mesh", "mtls"]),
+  ]),
+  oneMcpTool("CostExplorer", "cloud", "Multi-cloud spend attribution", "多云成本分摊", "finops-mcp", "released", 4, ["finops"]),
+  oneMcpTool("CloudAudit", "cloud", "Continuous compliance evidence", "持续合规证据采集", "compliance-mcp", "dev", 9, ["security"]),
+  oneMcpTool("MultiCloud", "cloud", "Cross-provider workload mover", "跨云负载迁移", "workload-mover-mcp", "dev", 6, ["multi"]),
+  oneMcpTool("EdgeProvision", "cloud", "Edge node bring-up automation", "边缘节点开通自动化", "edge-bringup-mcp", "dev", 2, ["edge"]),
 
   // ── Industry · Terminals ───────────────────────────────────────
-  singleMcpTool("DeviceSim", "terminals", "released", 6, "Phone/tablet behavioral simulator", "手机/平板行为仿真器", ["sim"]),
-  singleMcpTool("FirmwareForge", "terminals", "dev", 10, "Cross-arch firmware build matrix", "跨架构固件构建矩阵", ["build", "fw"]),
-  singleMcpTool("BatteryLab", "terminals", "released", 3, "Battery wear + thermal logs", "电池老化与热日志", ["battery"]),
+  oneMcpTool("DeviceSim", "terminals", "Phone/tablet behavioral simulator", "手机/平板行为仿真器", "device-sim-mcp", "released", 6, ["sim"]),
+  tool("FirmwareForge", "terminals", "Cross-arch firmware build matrix", "跨架构固件构建矩阵", [
+    mcp("firmware-build-mcp", "dev", 7, "Cross-arch firmware build", "跨架构固件构建", ["build", "fw"]),
+    mcp("fw-sign-mcp", "dev", 3, "Signed firmware image assembly", "已签名固件镜像组装", ["fw", "sign"]),
+  ]),
+  oneMcpTool("BatteryLab", "terminals", "Battery wear + thermal logs", "电池老化与热日志", "battery-log-mcp", "released", 3, ["battery"]),
   noMcpTool("ScreenTest", "terminals", "Pixel-level display QA suite", "像素级显示 QA 套件"),
-  noMcpTool("BSP-Pack", "terminals", "Board support package authoring", "BSP 制作工具"),
+  oneMcpTool("BSP-Pack", "terminals", "Board support package authoring", "BSP 制作工具", "bsp-author-mcp", "dev", 4, ["bsp"]),
 
   // ── Industry · Optical ────────────────────────────────────────
-  singleMcpTool("OFiberPlan", "optical", "released", 5, "Fiber route + budget calculator", "光纤路由与预算计算", ["fiber"]),
-  singleMcpTool("WDM-Tune", "optical", "dev", 3, "WDM channel tuner & monitor", "WDM 通道调谐与监控", ["wdm"]),
+  oneMcpTool("OFiberPlan", "optical", "Fiber route + budget calculator", "光纤路由与预算计算", "fiber-route-mcp", "released", 5, ["fiber"]),
+  oneMcpTool("WDM-Tune", "optical", "WDM channel tuner & monitor", "WDM 通道调谐与监控", "wdm-channel-mcp", "dev", 3, ["wdm"]),
   noMcpTool("OTDR-Sweep", "optical", "OTDR scan ingestion & alerts", "OTDR 扫描接入与告警"),
 
   // ── Industry · Carrier ────────────────────────────────────────
-  singleMcpTool("CarrierOps", "carrier", "released", 8, "Operator NMS workflows", "运营商 NMS 工作流", ["nms"]),
-  singleMcpTool("ChurnPredict", "carrier", "dev", 2, "Subscriber churn signals", "用户流失信号分析", ["ml"]),
+  oneMcpTool("CarrierOps", "carrier", "Operator NMS workflows", "运营商 NMS 工作流", "nms-workflow-mcp", "released", 8, ["nms"]),
+  oneMcpTool("ChurnPredict", "carrier", "Subscriber churn signals", "用户流失信号分析", "churn-signal-mcp", "dev", 2, ["ml"]),
 
   // ── Industry · Enterprise ─────────────────────────────────────
-  singleMcpTool("EntDeploy", "enterprise", "released", 4, "Enterprise rollout playbooks", "企业部署剧本", ["deploy"]),
-  noMcpTool("LicensePool", "enterprise", "License inventory & reclaim", "许可证清点与回收"),
+  oneMcpTool("EntDeploy", "enterprise", "Enterprise rollout playbooks", "企业部署剧本", "rollout-playbook-mcp", "released", 4, ["deploy"]),
+  oneMcpTool("LicensePool", "enterprise", "License inventory & reclaim", "许可证清点与回收", "license-mcp", "dev", 5, ["license"]),
 
   // ── Industry · Consumer ──────────────────────────────────────
-  singleMcpTool("ConsumerCRM", "consumer", "released", 3, "Consumer device support CRM", "消费者设备支持 CRM", ["crm"]),
-  singleMcpTool("RetailKit", "consumer", "dev", 2, "Retail demo + provisioning", "零售演示与开通", ["retail"]),
+  oneMcpTool("ConsumerCRM", "consumer", "Consumer device support CRM", "消费者设备支持 CRM", "crm-ticket-mcp", "released", 3, ["crm"]),
+  oneMcpTool("RetailKit", "consumer", "Retail demo + provisioning", "零售演示与开通", "retail-demo-mcp", "dev", 2, ["retail"]),
 
   // ── Industry · Digital Energy ─────────────────────────────────
-  singleMcpTool("GridSCADA", "energy", "dev", 7, "Grid SCADA bridge + analytics", "电网 SCADA 桥接与分析", ["scada"]),
-  singleMcpTool("InverterTune", "energy", "released", 2, "PV inverter parameter tuning", "光伏逆变器参数调优", ["pv"]),
+  oneMcpTool("GridSCADA", "energy", "Grid SCADA bridge + analytics", "电网 SCADA 桥接与分析", "scada-bridge-mcp", "dev", 7, ["scada"]),
+  oneMcpTool("InverterTune", "energy", "PV inverter parameter tuning", "光伏逆变器参数调优", "pv-tune-mcp", "released", 2, ["pv"]),
 
   // ── Industry · Intelligent Auto ───────────────────────────────
-  singleMcpTool("ADAS-Replay", "auto", "released", 5, "ADAS sensor log replay farm", "ADAS 传感器日志回放集群", ["adas"]),
-  singleMcpTool("OTA-Vehicle", "auto", "dev", 4, "Vehicle OTA campaign manager", "整车 OTA 活动管理", ["ota"]),
-  noMcpTool("HD-Map", "auto", "HD map authoring + diff", "高精地图编辑与对比"),
+  oneMcpTool("ADAS-Replay", "auto", "ADAS sensor log replay farm", "ADAS 传感器日志回放集群", "sensor-replay-mcp", "released", 5, ["adas"]),
+  oneMcpTool("OTA-Vehicle", "auto", "Vehicle OTA campaign manager", "整车 OTA 活动管理", "ota-campaign-mcp", "dev", 4, ["ota"]),
+  oneMcpTool("HD-Map", "auto", "HD map authoring + diff", "高精地图编辑与对比", "hdmap-author-mcp", "dev", 3, ["map"]),
 
   // ── Industry · Smart City ─────────────────────────────────────
-  singleMcpTool("CityOpsHub", "smartcity", "dev", 6, "Municipal ops command", "城市运营指挥", ["city"]),
-  singleMcpTool("TrafficSig", "smartcity", "released", 3, "Adaptive traffic signal control", "自适应交通信号控制", ["traffic"]),
+  oneMcpTool("CityOpsHub", "smartcity", "Municipal ops command", "城市运营指挥", "city-ops-mcp", "dev", 6, ["city"]),
+  oneMcpTool("TrafficSig", "smartcity", "Adaptive traffic signal control", "自适应交通信号控制", "signal-control-mcp", "released", 3, ["traffic"]),
 
   // ── Industry · Industrial ─────────────────────────────────────
-  singleMcpTool("MES-Bridge", "industrial", "released", 9, "MES ↔ shop-floor data bridge", "MES 与产线数据桥接", ["mes"]),
-  singleMcpTool("RobotOrchestrate", "industrial", "dev", 4, "Cell-level robot orchestration", "工位级机器人编排", ["robotics"]),
-  noMcpTool("PredMaint", "industrial", "Predictive maintenance baseline", "预测性维护基线"),
+  oneMcpTool("MES-Bridge", "industrial", "MES ↔ shop-floor data bridge", "MES 与产线数据桥接", "mes-bridge-mcp", "released", 9, ["mes"]),
+  oneMcpTool("RobotOrchestrate", "industrial", "Cell-level robot orchestration", "工位级机器人编排", "robot-cell-mcp", "dev", 4, ["robotics"]),
+  oneMcpTool("PredMaint", "industrial", "Predictive maintenance baseline", "预测性维护基线", "predmaint-mcp", "dev", 2, ["pdm"]),
 
   // ── Public · AI R&D · System Design ────────────────────────────
-  singleMcpTool("ArchDesigner", "airnd.sysdesign", "released", 9, "Block-diagram architecture authoring", "架构框图编辑", ["arch", "spec"]),
-  singleMcpTool("ReqAnalyzer", "airnd.sysdesign", "dev", 6, "Requirement extraction from docs", "从文档抽取需求", ["req", "nlp"]),
-  singleMcpTool("SpecGen", "airnd.sysdesign", "released", 4, "Boilerplate spec generator", "规范文档生成器", ["spec"]),
+  oneMcpTool("ArchDesigner", "airnd.sysdesign", "Block-diagram architecture authoring", "架构框图编辑", "arch-block-mcp", "released", 9, ["arch", "spec"]),
+  oneMcpTool("ReqAnalyzer", "airnd.sysdesign", "Requirement extraction from docs", "从文档抽取需求", "req-extract-mcp", "dev", 6, ["req", "nlp"]),
+  oneMcpTool("SpecGen", "airnd.sysdesign", "Boilerplate spec generator", "规范文档生成器", "spec-gen-mcp", "released", 4, ["spec"]),
   noMcpTool("TradeStudy", "airnd.sysdesign", "Trade-study comparison matrix", "权衡分析矩阵"),
 
   // ── Public · AI R&D · Development Services ─────────────────────
-  singleMcpTool("IDE", "airnd.devsvcs", "released", 38, "Internal IDE with AI assist", "内部 AI 增强 IDE", ["ide", "editor"]),
+  // IDE exposes its code-context surface separately from its pair-programming
+  // surface — agents that only need read access don't need the assistant.
+  tool("IDE", "airnd.devsvcs", "Internal IDE with AI assist", "内部 AI 增强 IDE", [
+    mcp("code-context-mcp", "released", 28, "Project-wide code context + reads", "项目级代码上下文与读取", ["ide", "context"]),
+    mcp("ai-pair-mcp", "released", 14, "AI pair-programming actions", "AI 结对编程操作", ["ide", "ai"]),
+  ]),
   // CodeCheck is a static-analysis suite exposing two MCP surfaces:
   // codecheck-mcp (shipped) and molint-mcp (in dev).
   tool("CodeCheck", "airnd.devsvcs", "Static analysis suite", "静态分析套件", [
     mcp("codecheck-mcp", "released", 26, "Static analysis + style enforcement", "静态分析与代码风格检查", ["lint", "static"]),
     mcp("molint-mcp", "dev", 8, "Modular lint engine", "模块化 Lint 引擎", ["lint"]),
   ]),
-  singleMcpTool("DT", "airnd.devsvcs", "dev", 18, "Distributed Tracing for builds", "构建分布式追踪", ["trace"]),
-  singleMcpTool("CodeNav", "airnd.devsvcs", "released", 15, "Repo-scale code search & xref", "仓库级代码检索与交叉引用", ["search"]),
-  singleMcpTool("SnippetHub", "airnd.devsvcs", "dev", 8, "Reusable snippet registry", "可复用代码片段注册表", ["snippet"]),
-  noMcpTool("RefactorBot", "airnd.devsvcs", "Bulk refactor proposer", "批量重构建议器"),
+  oneMcpTool("DT", "airnd.devsvcs", "Distributed Tracing for builds", "构建分布式追踪", "trace-collect-mcp", "dev", 18, ["trace"]),
+  tool("CodeNav", "airnd.devsvcs", "Repo-scale code search & xref", "仓库级代码检索与交叉引用", [
+    mcp("code-search-mcp", "released", 10, "Full-text + symbol code search", "全文与符号代码检索", ["search"]),
+    mcp("code-xref-mcp", "released", 7, "Cross-reference + call graph", "交叉引用与调用图", ["xref"]),
+  ]),
+  oneMcpTool("SnippetHub", "airnd.devsvcs", "Reusable snippet registry", "可复用代码片段注册表", "snippet-registry-mcp", "dev", 8, ["snippet"]),
+  oneMcpTool("RefactorBot", "airnd.devsvcs", "Bulk refactor proposer", "批量重构建议器", "bulk-refactor-mcp", "dev", 5, ["refactor"]),
 
   // ── Public · AI R&D · Testing Services ─────────────────────────
-  singleMcpTool("TestForge", "airnd.testsvcs", "released", 12, "Test plan + suite generator", "测试计划与用例生成器", ["tests"]),
-  singleMcpTool("AutoTest", "airnd.testsvcs", "released", 9, "Browser/device test farm", "浏览器/终端测试集群", ["e2e"]),
-  singleMcpTool("PerfBench", "airnd.testsvcs", "dev", 7, "Reproducible perf benchmarks", "可复现性能基准", ["perf"]),
-  noMcpTool("ChaosKit", "airnd.testsvcs", "Chaos engineering scenarios", "混沌工程场景"),
-  singleMcpTool("CoverageVue", "airnd.testsvcs", "dev", 4, "Coverage drift visualizer", "覆盖率漂移可视化", ["coverage"]),
+  tool("TestForge", "airnd.testsvcs", "Test plan + suite generator", "测试计划与用例生成器", [
+    mcp("testplan-mcp", "released", 8, "Test plan authoring", "测试计划编辑", ["tests"]),
+    mcp("suite-gen-mcp", "released", 5, "Test suite scaffolding", "测试套件脚手架", ["tests"]),
+  ]),
+  tool("AutoTest", "airnd.testsvcs", "Browser/device test farm", "浏览器/终端测试集群", [
+    mcp("browser-test-mcp", "released", 6, "Playwright-style browser runs", "Playwright 风格浏览器测试", ["e2e", "browser"]),
+    mcp("device-test-mcp", "released", 4, "Physical-device test runs", "物理设备测试", ["e2e", "device"]),
+  ]),
+  oneMcpTool("PerfBench", "airnd.testsvcs", "Reproducible perf benchmarks", "可复现性能基准", "perf-bench-mcp", "dev", 7, ["perf"]),
+  oneMcpTool("ChaosKit", "airnd.testsvcs", "Chaos engineering scenarios", "混沌工程场景", "chaos-scenario-mcp", "dev", 3, ["chaos"]),
+  oneMcpTool("CoverageVue", "airnd.testsvcs", "Coverage drift visualizer", "覆盖率漂移可视化", "coverage-drift-mcp", "dev", 4, ["coverage"]),
 
   // ── Public · AI R&D · R&D Maintenance ──────────────────────────
-  singleMcpTool("BugTracker", "airnd.rndmaint", "released", 30, "Issue tracker + SLA workflows", "缺陷跟踪与 SLA 工作流", ["bugs"]),
-  singleMcpTool("IncidentMgr", "airnd.rndmaint", "released", 18, "Incident response coordination", "事故响应协同", ["sre"]),
-  singleMcpTool("RootCause", "airnd.rndmaint", "dev", 11, "Causality across telemetry", "全链路根因分析", ["rca", "ml"]),
-  noMcpTool("HotfixPilot", "airnd.rndmaint", "Hotfix branching automation", "热修复分支自动化"),
+  tool("BugTracker", "airnd.rndmaint", "Issue tracker + SLA workflows", "缺陷跟踪与 SLA 工作流", [
+    mcp("issue-mcp", "released", 22, "Issue CRUD + queries", "缺陷增删改查与查询", ["bugs"]),
+    mcp("sla-mcp", "released", 8, "SLA timer + escalation", "SLA 计时与升级", ["sla"]),
+  ]),
+  oneMcpTool("IncidentMgr", "airnd.rndmaint", "Incident response coordination", "事故响应协同", "incident-coord-mcp", "released", 18, ["sre"]),
+  oneMcpTool("RootCause", "airnd.rndmaint", "Causality across telemetry", "全链路根因分析", "rca-mcp", "dev", 11, ["rca", "ml"]),
+  oneMcpTool("HotfixPilot", "airnd.rndmaint", "Hotfix branching automation", "热修复分支自动化", "hotfix-branch-mcp", "dev", 4, ["hotfix"]),
 
   // ── Public · AI R&D · AI Production Line ───────────────────────
-  singleMcpTool("ModelHub", "airnd.aiprod", "released", 22, "Model registry + lineage", "模型注册与血缘", ["mlops"]),
-  singleMcpTool("DataPipe", "airnd.aiprod", "released", 16, "Pipeline orchestrator", "流水线编排器", ["etl"]),
-  singleMcpTool("TrainOps", "airnd.aiprod", "dev", 14, "Distributed training scheduler", "分布式训练调度", ["train"]),
-  singleMcpTool("EvalSuite", "airnd.aiprod", "dev", 8, "Model eval & A/B harness", "模型评估与 A/B 框架", ["eval"]),
-  singleMcpTool("ServeMesh", "airnd.aiprod", "released", 11, "Model serving with autoscale", "弹性扩缩的模型服务", ["serve"]),
+  tool("ModelHub", "airnd.aiprod", "Model registry + lineage", "模型注册与血缘", [
+    mcp("model-registry-mcp", "released", 16, "Model versioning + tags", "模型版本与标签", ["mlops"]),
+    mcp("lineage-mcp", "dev", 6, "Training data + run lineage", "训练数据与运行血缘", ["lineage"]),
+  ]),
+  oneMcpTool("DataPipe", "airnd.aiprod", "Pipeline orchestrator", "流水线编排器", "pipeline-orch-mcp", "released", 16, ["etl"]),
+  oneMcpTool("TrainOps", "airnd.aiprod", "Distributed training scheduler", "分布式训练调度", "train-scheduler-mcp", "dev", 14, ["train"]),
+  tool("EvalSuite", "airnd.aiprod", "Model eval & A/B harness", "模型评估与 A/B 框架", [
+    mcp("eval-harness-mcp", "dev", 5, "Model evaluation harness", "模型评测框架", ["eval"]),
+    mcp("ab-test-mcp", "dev", 3, "A/B comparison runs", "A/B 对比实验", ["ab"]),
+  ]),
+  oneMcpTool("ServeMesh", "airnd.aiprod", "Model serving with autoscale", "弹性扩缩的模型服务", "model-serve-mcp", "released", 11, ["serve"]),
 
   // ── Public · AI R&D · Knowledge Services ───────────────────────
-  singleMcpTool("WikiSync", "airnd.knowsvcs", "released", 19, "Wiki ingestion + sync", "Wiki 接入与同步", ["wiki"]),
-  singleMcpTool("DocsGen", "airnd.knowsvcs", "released", 14, "Auto-generated reference docs", "自动生成参考文档", ["docs"]),
-  singleMcpTool("KnowledgeGraph", "airnd.knowsvcs", "dev", 9, "Org-wide entity graph", "组织级实体图谱", ["graph"]),
-  singleMcpTool("AskOrg", "airnd.knowsvcs", "dev", 6, "Org RAG-style Q&A", "组织 RAG 问答", ["rag"]),
-  noMcpTool("Onboarding", "airnd.knowsvcs", "New-hire knowledge path", "新人知识路径"),
+  oneMcpTool("WikiSync", "airnd.knowsvcs", "Wiki ingestion + sync", "Wiki 接入与同步", "wiki-sync-mcp", "released", 19, ["wiki"]),
+  tool("DocsGen", "airnd.knowsvcs", "Auto-generated reference docs", "自动生成参考文档", [
+    mcp("docs-gen-mcp", "released", 9, "Markdown doc generation", "Markdown 文档生成", ["docs"]),
+    mcp("api-ref-mcp", "released", 5, "API reference extraction", "API 参考抽取", ["docs", "api"]),
+  ]),
+  oneMcpTool("KnowledgeGraph", "airnd.knowsvcs", "Org-wide entity graph", "组织级实体图谱", "entity-graph-mcp", "dev", 9, ["graph"]),
+  oneMcpTool("AskOrg", "airnd.knowsvcs", "Org RAG-style Q&A", "组织 RAG 问答", "org-rag-mcp", "dev", 6, ["rag"]),
+  oneMcpTool("Onboarding", "airnd.knowsvcs", "New-hire knowledge path", "新人知识路径", "onboarding-path-mcp", "dev", 3, ["onboard"]),
 
   // ── Public · Product & Software · Research ─────────────────────
-  singleMcpTool("IdeaPad", "prodsw.research", "dev", 5, "Idea capture + scoring", "创意收集与评分", ["ideation"]),
-  singleMcpTool("PatentSearch", "prodsw.research", "released", 3, "Patent prior-art search", "专利现有技术检索", ["patent"]),
+  oneMcpTool("IdeaPad", "prodsw.research", "Idea capture + scoring", "创意收集与评分", "idea-score-mcp", "dev", 5, ["ideation"]),
+  oneMcpTool("PatentSearch", "prodsw.research", "Patent prior-art search", "专利现有技术检索", "patent-search-mcp", "released", 3, ["patent"]),
 
   // ── Public · Product & Software · Product Mgmt ─────────────────
-  singleMcpTool("RoadmapHub", "prodsw.prodmgmt", "released", 12, "Org-wide roadmap & dependencies", "组织级路线图与依赖", ["roadmap"]),
-  singleMcpTool("FeatureFlags", "prodsw.prodmgmt", "released", 8, "Targeted feature rollout", "定向特性灰度", ["flags"]),
-  singleMcpTool("CustomerVoice", "prodsw.prodmgmt", "dev", 4, "Voice-of-customer aggregator", "客户之声聚合", ["voc"]),
+  tool("RoadmapHub", "prodsw.prodmgmt", "Org-wide roadmap & dependencies", "组织级路线图与依赖", [
+    mcp("roadmap-mcp", "released", 8, "Roadmap entry CRUD", "路线图条目增删改查", ["roadmap"]),
+    mcp("deps-mcp", "released", 4, "Cross-team dependency graph", "跨团队依赖图", ["roadmap", "deps"]),
+  ]),
+  oneMcpTool("FeatureFlags", "prodsw.prodmgmt", "Targeted feature rollout", "定向特性灰度", "flags-mcp", "released", 8, ["flags"]),
+  oneMcpTool("CustomerVoice", "prodsw.prodmgmt", "Voice-of-customer aggregator", "客户之声聚合", "voc-aggregator-mcp", "dev", 4, ["voc"]),
 
   // ── Public · Product & Software · Build ────────────────────────
-  singleMcpTool("BuildBot", "prodsw.buildsvcs", "released", 33, "Distributed build farm", "分布式构建集群", ["build"]),
-  singleMcpTool("ArtifactReg", "prodsw.buildsvcs", "released", 24, "Binary artifact store", "二进制制品库", ["artifact"]),
-  singleMcpTool("PipelineHub", "prodsw.buildsvcs", "dev", 15, "Pipeline-as-code platform", "流水线即代码平台", ["ci"]),
-  noMcpTool("CacheGrid", "prodsw.buildsvcs", "Cross-job build cache", "跨任务构建缓存"),
+  tool("BuildBot", "prodsw.buildsvcs", "Distributed build farm", "分布式构建集群", [
+    mcp("build-runner-mcp", "released", 26, "Submit + tail build jobs", "提交与跟踪构建任务", ["build"]),
+    mcp("build-cache-mcp", "dev", 7, "Remote build cache lookup", "远端构建缓存查询", ["build", "cache"]),
+  ]),
+  oneMcpTool("ArtifactReg", "prodsw.buildsvcs", "Binary artifact store", "二进制制品库", "artifact-mcp", "released", 24, ["artifact"]),
+  oneMcpTool("PipelineHub", "prodsw.buildsvcs", "Pipeline-as-code platform", "流水线即代码平台", "pipeline-as-code-mcp", "dev", 15, ["ci"]),
+  oneMcpTool("CacheGrid", "prodsw.buildsvcs", "Cross-job build cache", "跨任务构建缓存", "cache-grid-mcp", "dev", 6, ["cache"]),
 
   // ── Public · Product & Software · Release ──────────────────────
-  singleMcpTool("ReleaseTrain", "prodsw.release", "released", 11, "Release train coordinator", "发布列车协同", ["release"]),
-  singleMcpTool("CanaryGuard", "prodsw.release", "dev", 7, "Progressive delivery guard", "渐进式发布守门员", ["canary"]),
+  oneMcpTool("ReleaseTrain", "prodsw.release", "Release train coordinator", "发布列车协同", "release-train-mcp", "released", 11, ["release"]),
+  oneMcpTool("CanaryGuard", "prodsw.release", "Progressive delivery guard", "渐进式发布守门员", "canary-guard-mcp", "dev", 7, ["canary"]),
 
   // ── Public · Product & Software · UX ───────────────────────────
-  singleMcpTool("DesignTokens", "prodsw.uxdesign", "released", 9, "Cross-platform token sync", "跨平台设计令牌同步", ["tokens"]),
-  singleMcpTool("ComponentLab", "prodsw.uxdesign", "dev", 6, "Component playground + a11y", "组件实验室与无障碍检查", ["ui"]),
+  oneMcpTool("DesignTokens", "prodsw.uxdesign", "Cross-platform token sync", "跨平台设计令牌同步", "tokens-sync-mcp", "released", 9, ["tokens"]),
+  oneMcpTool("ComponentLab", "prodsw.uxdesign", "Component playground + a11y", "组件实验室与无障碍检查", "component-a11y-mcp", "dev", 6, ["ui"]),
 
   // ── Public · Product & Software · i18n ─────────────────────────
-  singleMcpTool("LocoSync", "prodsw.i18n", "released", 4, "Translation memory sync", "翻译记忆同步", ["i18n"]),
+  oneMcpTool("LocoSync", "prodsw.i18n", "Translation memory sync", "翻译记忆同步", "tm-sync-mcp", "released", 4, ["i18n"]),
   noMcpTool("PseudoLocale", "prodsw.i18n", "Pseudo-locale generator", "伪本地化生成器"),
 
   // ── Public · Product & Software · Support ──────────────────────
-  singleMcpTool("TicketPilot", "prodsw.support", "released", 7, "Support ticket triage", "工单分诊", ["support"]),
-  singleMcpTool("KBPilot", "prodsw.support", "dev", 3, "Self-serve KB authoring", "自助知识库编辑", ["kb"]),
+  oneMcpTool("TicketPilot", "prodsw.support", "Support ticket triage", "工单分诊", "ticket-triage-mcp", "released", 7, ["support"]),
+  oneMcpTool("KBPilot", "prodsw.support", "Self-serve KB authoring", "自助知识库编辑", "kb-author-mcp", "dev", 3, ["kb"]),
 
   // ── Public · Product & Software · Analytics ────────────────────
-  singleMcpTool("EventBus", "prodsw.analytics", "released", 18, "Product event ingestion", "产品事件接入", ["analytics"]),
-  singleMcpTool("FunnelLab", "prodsw.analytics", "dev", 5, "Funnel/cohort analytics", "漏斗与群组分析", ["funnel"]),
+  oneMcpTool("EventBus", "prodsw.analytics", "Product event ingestion", "产品事件接入", "event-ingest-mcp", "released", 18, ["analytics"]),
+  oneMcpTool("FunnelLab", "prodsw.analytics", "Funnel/cohort analytics", "漏斗与群组分析", "funnel-cohort-mcp", "dev", 5, ["funnel"]),
 
   // ── Public · Hardware ──────────────────────────────────────────
-  singleMcpTool("SchemaPilot", "hardware.schematic", "released", 6, "Schematic linting + reuse", "原理图检查与复用", ["schematic"]),
-  singleMcpTool("PCBFlow", "hardware.pcb", "released", 8, "PCB layout review tools", "PCB 布局评审工具", ["pcb"]),
-  singleMcpTool("MechCAD-Sync", "hardware.mech", "dev", 4, "Mechanical CAD versioning", "机械 CAD 版本管理", ["cad"]),
-  singleMcpTool("ThermSim", "hardware.thermals", "dev", 3, "Thermal simulation runner", "热仿真运行器", ["thermal"]),
+  oneMcpTool("SchemaPilot", "hardware.schematic", "Schematic linting + reuse", "原理图检查与复用", "schematic-lint-mcp", "released", 6, ["schematic"]),
+  oneMcpTool("PCBFlow", "hardware.pcb", "PCB layout review tools", "PCB 布局评审工具", "pcb-review-mcp", "released", 8, ["pcb"]),
+  oneMcpTool("MechCAD-Sync", "hardware.mech", "Mechanical CAD versioning", "机械 CAD 版本管理", "cad-version-mcp", "dev", 4, ["cad"]),
+  oneMcpTool("ThermSim", "hardware.thermals", "Thermal simulation runner", "热仿真运行器", "thermal-sim-mcp", "dev", 3, ["thermal"]),
   noMcpTool("EMC-Lab", "hardware.thermals", "EMC test orchestration", "EMC 测试编排"),
-  singleMcpTool("HWVerif", "hardware.hwverif", "released", 5, "HW verification dashboard", "硬件验证仪表盘", ["verif"]),
+  oneMcpTool("HWVerif", "hardware.hwverif", "HW verification dashboard", "硬件验证仪表盘", "hw-verif-mcp", "released", 5, ["verif"]),
 
   // ── Public · Product Digitization ─────────────────────────────
-  singleMcpTool("PLM-Bridge", "proddigi.plm", "released", 14, "PLM data bridge to R&D", "PLM 数据桥接研发", ["plm"]),
-  singleMcpTool("TwinForge", "proddigi.twin", "dev", 6, "Digital twin authoring", "数字孪生编辑器", ["twin"]),
-  singleMcpTool("DataCatalog", "proddigi.datacat", "released", 21, "Org data catalog", "组织数据目录", ["data"]),
-  singleMcpTool("ProcessFlow", "proddigi.process", "dev", 8, "Process automation studio", "流程自动化编辑器", ["bpm"]),
-  singleMcpTool("FormBuilder", "proddigi.process", "released", 5, "Internal form builder", "内部表单构建器", ["forms"]),
+  oneMcpTool("PLM-Bridge", "proddigi.plm", "PLM data bridge to R&D", "PLM 数据桥接研发", "plm-bridge-mcp", "released", 14, ["plm"]),
+  oneMcpTool("TwinForge", "proddigi.twin", "Digital twin authoring", "数字孪生编辑器", "twin-author-mcp", "dev", 6, ["twin"]),
+  oneMcpTool("DataCatalog", "proddigi.datacat", "Org data catalog", "组织数据目录", "data-catalog-mcp", "released", 21, ["data"]),
+  oneMcpTool("ProcessFlow", "proddigi.process", "Process automation studio", "流程自动化编辑器", "process-studio-mcp", "dev", 8, ["bpm"]),
+  oneMcpTool("FormBuilder", "proddigi.process", "Internal form builder", "内部表单构建器", "form-builder-mcp", "released", 5, ["forms"]),
 
   // ── Public · Infrastructure ───────────────────────────────────
-  singleMcpTool("ComputePilot", "infra.compute", "released", 28, "Compute fleet manager", "算力集群管理", ["compute"]),
-  singleMcpTool("NetCore", "infra.network", "released", 19, "Internal network control", "内部网络管控", ["network"]),
-  singleMcpTool("StoreOps", "infra.storage", "released", 17, "Storage tiering + backup", "存储分层与备份", ["storage"]),
-  singleMcpTool("VaultID", "infra.iam", "released", 31, "Identity + secrets", "身份与机密管理", ["iam"]),
-  singleMcpTool("ObservHub", "infra.observ", "released", 26, "Metrics/logs/traces hub", "指标/日志/追踪中枢", ["o11y"]),
-  singleMcpTool("AlertPilot", "infra.observ", "dev", 12, "Alert routing & dedupe", "告警路由与去重", ["alert"]),
-  singleMcpTool("SecOpsCenter", "infra.secops", "released", 14, "Security operations console", "安全运营控制台", ["secops"]),
-  singleMcpTool("ThreatHunt", "infra.secops", "dev", 7, "Threat hunting playbooks", "威胁狩猎剧本", ["threat"]),
+  oneMcpTool("ComputePilot", "infra.compute", "Compute fleet manager", "算力集群管理", "compute-fleet-mcp", "released", 28, ["compute"]),
+  oneMcpTool("NetCore", "infra.network", "Internal network control", "内部网络管控", "net-control-mcp", "released", 19, ["network"]),
+  tool("StoreOps", "infra.storage", "Storage tiering + backup", "存储分层与备份", [
+    mcp("storage-tier-mcp", "released", 12, "Tiering + lifecycle policy", "分层与生命周期策略", ["storage"]),
+    mcp("backup-mcp", "released", 5, "Backup schedule + restore", "备份调度与恢复", ["backup"]),
+  ]),
+  tool("VaultID", "infra.iam", "Identity + secrets", "身份与机密管理", [
+    mcp("identity-mcp", "released", 22, "User + role identity", "用户与角色身份", ["iam"]),
+    mcp("secrets-mcp", "released", 9, "Secret read + rotate", "机密读取与轮换", ["iam", "secrets"]),
+  ]),
+  // ObservHub is the second 3-MCP showcase: metrics + logs + traces are
+  // distinct surfaces in real observability stacks.
+  tool("ObservHub", "infra.observ", "Metrics/logs/traces hub", "指标/日志/追踪中枢", [
+    mcp("metrics-mcp", "released", 14, "Time-series metrics query", "时序指标查询", ["o11y", "metrics"]),
+    mcp("logs-mcp", "released", 9, "Log search + tail", "日志检索与跟踪", ["o11y", "logs"]),
+    mcp("traces-mcp", "dev", 3, "Distributed trace lookup", "分布式追踪查询", ["o11y", "traces"]),
+  ]),
+  oneMcpTool("AlertPilot", "infra.observ", "Alert routing & dedupe", "告警路由与去重", "alert-route-mcp", "dev", 12, ["alert"]),
+  oneMcpTool("SecOpsCenter", "infra.secops", "Security operations console", "安全运营控制台", "secops-console-mcp", "released", 14, ["secops"]),
+  oneMcpTool("ThreatHunt", "infra.secops", "Threat hunting playbooks", "威胁狩猎剧本", "threat-hunt-mcp", "dev", 7, ["threat"]),
   noMcpTool("BackupVerify", "infra.storage", "Backup restore drill runner", "备份恢复演练"),
 ]
 
