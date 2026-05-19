@@ -515,13 +515,17 @@
       "noMcp": "No MCP needed",
       "leading": "Leading",
       "lagging": "Lagging",
+      "topReleased": "Top by release %",
+      "filterBy": "Filter by {status}",
       "groupsCount": "{groups} groups · {mcps} MCPs"
     },
     "card": {
       "live": "live",
       "dev": "dev",
       "none": "—",
-      "liveSuffix": "{pct}% live"
+      "liveSuffix": "{pct}% live",
+      "releasedShort": "released",
+      "drillIn": "View {name}"
     },
     "view": {
       "panorama": "Panorama",
@@ -537,6 +541,8 @@
       "lastUpdate": "Last update",
       "owner": "Owner",
       "endpoint": "Endpoint",
+      "copyEndpoint": "Copy MCP URI",
+      "copied": "Copied",
       "toolContext": "Tool",
       "mcp": "MCP",
       "otherMcps": "Other MCPs in this tool",

@@ -515,13 +515,17 @@
       "noMcp": "无需 MCP",
       "leading": "领先",
       "lagging": "落后",
+      "topReleased": "按发布率排名",
+      "filterBy": "按「{status}」筛选",
       "groupsCount": "{groups} 个分组 · {mcps} 个 MCP"
     },
     "card": {
       "live": "已发布",
       "dev": "开发中",
       "none": "—",
-      "liveSuffix": "{pct}% 已发布"
+      "liveSuffix": "{pct}% 已发布",
+      "releasedShort": "已发布",
+      "drillIn": "查看 {name}"
     },
     "view": {
       "panorama": "全景图",
@@ -537,6 +541,8 @@
       "lastUpdate": "最近更新",
       "owner": "所属团队",
       "endpoint": "Endpoint",
+      "copyEndpoint": "复制 MCP URI",
+      "copied": "已复制",
       "toolContext": "工具",
       "mcp": "MCP",
       "otherMcps": "本工具下的其他 MCP",

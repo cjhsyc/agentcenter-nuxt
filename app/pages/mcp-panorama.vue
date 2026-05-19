@@ -136,6 +136,18 @@ function clearDrill() {
 function pickMcp(payload: { tool: ToolDto; mcp: McpDto }) {
   active.value = payload
 }
+
+function drillTo(primary: string) {
+  activePrimary.value = primary
+  activeSecondary.value = null
+  active.value = null
+}
+
+function filterTo(status: McpStatus) {
+  // Same toggle behavior as the StatusChip buttons in SectionHeader —
+  // clicking the active status flips back to "all".
+  statusFilter.value = statusFilter.value === status ? "all" : status
+}
 </script>
 
 <template>
@@ -198,6 +210,8 @@ function pickMcp(payload: { tool: ToolDto; mcp: McpDto }) {
       :groups="filteredGroups"
       :active-mcp-id="active?.mcp.id ?? null"
       @pick="pickMcp"
+      @drill="drillTo"
+      @filter="filterTo"
     />
     <GroupedListView
       v-else-if="data && viewMode === 'list'"
