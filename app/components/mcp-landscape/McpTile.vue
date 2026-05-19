@@ -90,7 +90,6 @@ function onStaticPick() {
     v-else
     type="button"
     :title="tooltip"
-    :aria-disabled="mcp.isPlaceholder ? 'true' : undefined"
     :class="[...baseClass, 'cursor-pointer']"
     @click="onStaticPick"
   >

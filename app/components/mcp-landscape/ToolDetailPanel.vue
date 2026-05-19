@@ -94,14 +94,15 @@ const downstreams = computed<{ tool: ToolDto; mcp: McpDto }[]>(() => {
   const target = Math.min(mcp.value.depsCount, 5, all.length)
   const out: { tool: ToolDto; mcp: McpDto }[] = []
   const seen = new Set<number>()
-  let i = mcp.value.id * 7
-  while (out.length < target) {
-    const candidate = all[((i % all.length) + all.length) % all.length]!
-    if (!seen.has(candidate.mcp.id)) {
-      seen.add(candidate.mcp.id)
-      out.push(candidate)
-    }
-    i += 13
+  // Walk linearly from a deterministic offset, bounded by all.length so the
+  // loop always terminates — `i += 13` only converges when gcd(13, all.length)
+  // is 1, which isn't guaranteed for future seed sizes.
+  const start = (((mcp.value.id * 7) % all.length) + all.length) % all.length
+  for (let step = 0; step < all.length && out.length < target; step++) {
+    const candidate = all[(start + step) % all.length]!
+    if (seen.has(candidate.mcp.id)) continue
+    seen.add(candidate.mcp.id)
+    out.push(candidate)
   }
   return out
 })

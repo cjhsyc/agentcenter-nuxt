@@ -49,7 +49,7 @@ const rollupAriaLabel = computed(() =>
       <span
         v-if="realMcpCount > 1"
         class="font-mono text-[9px] text-(--color-ink-muted) shrink-0"
-        :aria-label="`${realMcpCount} MCPs`"
+        :aria-label="t('mcpPanorama.detail.mcpsCount', { count: realMcpCount })"
       >×{{ realMcpCount }}</span>
       <span
         class="ml-auto size-[6px] rounded-full shrink-0"
