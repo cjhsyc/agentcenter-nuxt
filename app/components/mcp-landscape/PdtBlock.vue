@@ -5,8 +5,7 @@ import {
   type PdtBlock,
   type ToolDto,
 } from "~~/shared/mcp-panorama"
-import McpTile from "./McpTile.vue"
-import ToolGroupHeader from "./ToolGroupHeader.vue"
+import ToolMcpsCard from "./ToolMcpsCard.vue"
 
 const props = defineProps<{
   pdt: PdtBlock
@@ -23,26 +22,21 @@ const mcpCount = computed(() =>
 </script>
 
 <template>
-  <div class="bg-(--color-bg) border border-(--color-border) rounded-lg p-2.5 flex flex-col gap-2">
-    <div class="flex items-center justify-between gap-2">
-      <span class="text-[12px] font-semibold text-(--color-ink) tracking-tight">{{ title }}</span>
-      <span class="font-mono text-[10px] text-(--color-ink-muted)">{{ mcpCount }}</span>
-    </div>
+  <section class="bg-(--color-bg) rounded-lg px-2.5 py-2.5 flex flex-col gap-2">
+    <header class="flex items-baseline justify-between gap-2 px-0.5">
+      <span class="font-serif text-[13px] font-medium text-(--color-ink) tracking-tight truncate">
+        {{ title }}
+      </span>
+      <span class="font-mono text-[10px] text-(--color-ink-muted) shrink-0">{{ mcpCount }}</span>
+    </header>
     <div class="flex flex-col gap-1.5">
-      <div v-for="tool in pdt.items" :key="tool.id" class="flex flex-col gap-1">
-        <ToolGroupHeader :tool="tool" />
-        <div class="flex flex-wrap gap-1 pl-2">
-          <McpTile
-            v-for="mcp in tool.mcps"
-            :key="mcp.id"
-            :tool="tool"
-            :mcp="mcp"
-            :active="activeMcpId === mcp.id"
-            compact
-            @pick="(p) => emit('pick', p)"
-          />
-        </div>
-      </div>
+      <ToolMcpsCard
+        v-for="tool in pdt.items"
+        :key="tool.id"
+        :tool="tool"
+        :active-mcp-id="activeMcpId"
+        @pick="(p) => emit('pick', p)"
+      />
     </div>
-  </div>
+  </section>
 </template>
