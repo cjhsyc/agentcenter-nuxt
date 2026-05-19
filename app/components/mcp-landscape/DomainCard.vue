@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { DomainGroup, ToolDto } from "~~/shared/mcp-panorama"
+import type { DomainGroup, McpDto, ToolDto } from "~~/shared/mcp-panorama"
 import CardHeader from "./CardHeader.vue"
 import PdtBlock from "./PdtBlock.vue"
 
 defineProps<{
   group: DomainGroup
-  activeId: number | null
+  activeMcpId: number | null
 }>()
-const emit = defineEmits<{ pick: [ToolDto] }>()
+const emit = defineEmits<{ pick: [{ tool: ToolDto; mcp: McpDto }] }>()
 </script>
 
 <template>
@@ -18,8 +18,8 @@ const emit = defineEmits<{ pick: [ToolDto] }>()
         v-for="pdt in group.pdts"
         :key="pdt.key"
         :pdt="pdt"
-        :active-id="activeId"
-        @pick="(t) => emit('pick', t)"
+        :active-mcp-id="activeMcpId"
+        @pick="(p) => emit('pick', p)"
       />
     </div>
   </article>

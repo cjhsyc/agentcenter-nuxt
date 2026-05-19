@@ -25,7 +25,7 @@ const rankClass = computed(() => {
         <h3 class="font-serif text-[18px] font-medium tracking-tight m-0 truncate text-(--color-ink)">
           {{ displayTitle }}
         </h3>
-        <span class="font-mono text-[11px] text-(--color-ink-muted)">{{ group.items.length }}</span>
+        <span class="font-mono text-[11px] text-(--color-ink-muted)">{{ group.stats.total }}</span>
       </div>
       <span
         v-if="rank"

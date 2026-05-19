@@ -48,8 +48,9 @@ export const mcpPdts = pgTable(
   (t) => [index("idx_mcp_pdts_domain_sort").on(t.domainKey, t.sortOrder)],
 );
 
-// One row per traditional internal tool service. Status is *derived* —
-// extensionId set ⇒ released; else inDev ⇒ dev; else none.
+// One row per traditional internal tool service. The tool is a *product*
+// header — name, owner, blurb. Status, deps, and the marketplace link live
+// per-MCP in `mcp_landscape_mcps` (a tool may expose 0–N MCPs).
 export const mcpLandscapeTools = pgTable(
   "mcp_landscape_tools",
   {
@@ -69,15 +70,8 @@ export const mcpLandscapeTools = pgTable(
     // the seed is the only writer and keeps them aligned; revisit when an admin UI
     // can mutate landscape rows.
     ownerPdt: text().references(() => mcpPdts.key, { onDelete: "restrict" }),
-    // Marketplace MCP listing. Non-null ⇒ tool is "released".
-    extensionId: text().references(() => extensions.id, {
-      onDelete: "set null",
-    }),
-    inDev: boolean().notNull().default(false),
-    depsCount: integer().notNull().default(0),
     blurb: text().notNull(),
     blurbZh: text().notNull(),
-    tags: text().array().notNull().default(sql`ARRAY[]::text[]`),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
@@ -87,17 +81,46 @@ export const mcpLandscapeTools = pgTable(
       t.ownerDomain,
       t.ownerPdt,
     ),
-    index("idx_mcp_tools_extension").on(t.extensionId),
-    // A tool can be released or in-dev or neither — not both.
-    check(
-      "mcp_tools_status_xor",
-      sql`NOT ("extension_id" IS NOT NULL AND "in_dev" = true)`,
-    ),
     // Industry tools own a sector; public tools own a domain (and usually a PDT).
     check(
       "mcp_tools_owner_layer",
       sql`(layer = 'industry' AND owner_sector IS NOT NULL AND owner_domain IS NULL AND owner_pdt IS NULL)
         OR (layer = 'public' AND owner_sector IS NULL AND owner_domain IS NOT NULL)`,
+    ),
+  ],
+);
+
+// MCP servers exposed by a tool. Status is *derived* —
+// extensionId set ⇒ released; else inDev ⇒ dev; else none.
+export const mcpLandscapeMcps = pgTable(
+  "mcp_landscape_mcps",
+  {
+    id: serial().primaryKey(),
+    toolId: integer()
+      .notNull()
+      .references(() => mcpLandscapeTools.id, { onDelete: "cascade" }),
+    slug: text().notNull().unique(),
+    name: text().notNull(),
+    nameZh: text(),
+    // Marketplace MCP listing. Non-null ⇒ this MCP is "released".
+    extensionId: text().references(() => extensions.id, {
+      onDelete: "set null",
+    }),
+    inDev: boolean().notNull().default(false),
+    depsCount: integer().notNull().default(0),
+    blurb: text().notNull(),
+    blurbZh: text().notNull(),
+    tags: text().array().notNull().default(sql`ARRAY[]::text[]`),
+    sortOrder: integer().notNull().default(0),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("idx_mcp_mcps_tool_sort").on(t.toolId, t.sortOrder),
+    index("idx_mcp_mcps_extension").on(t.extensionId),
+    // An MCP can be released or in-dev or neither — not both.
+    check(
+      "mcp_mcps_status_xor",
+      sql`NOT ("extension_id" IS NOT NULL AND "in_dev" = true)`,
     ),
   ],
 );

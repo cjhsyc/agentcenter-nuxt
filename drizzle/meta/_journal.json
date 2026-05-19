@@ -43,6 +43,13 @@
       "when": 1779096044929,
       "tag": "0005_gifted_quasar",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779160412086,
+      "tag": "0006_third_pete_wisdom",
+      "breakpoints": true
     }
   ]
 }

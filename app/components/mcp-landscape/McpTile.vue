@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { ChevronRight } from "lucide-vue-next"
-import { toolDisplayName, type ToolDto } from "~~/shared/mcp-panorama"
+import {
+  mcpDisplayName,
+  toolDisplayName,
+  type McpDto,
+  type ToolDto,
+} from "~~/shared/mcp-panorama"
 
 const props = withDefaults(
   defineProps<{
     tool: ToolDto
+    mcp: McpDto
     active?: boolean
     /** Compact = used inside PdtBlock or dense panorama mode. */
     compact?: boolean
@@ -12,29 +18,38 @@ const props = withDefaults(
   { active: false, compact: false },
 )
 
-const emit = defineEmits<{ pick: [ToolDto] }>()
+const emit = defineEmits<{ pick: [{ tool: ToolDto; mcp: McpDto }] }>()
 
 const { locale, t } = useI18n()
 const localePath = useLocalePath()
 
-const displayName = computed(() => toolDisplayName(props.tool, locale.value))
-const isReleased = computed(() => props.tool.status === "released")
-const showDeps = computed(() => props.tool.depsCount >= 10)
+const displayName = computed(() => {
+  // Placeholder tiles render the tool's display name (e.g. "RefactorBot") —
+  // there is no real MCP yet, so the MCP-as-tile label uses the parent name.
+  if (props.mcp.isPlaceholder) return toolDisplayName(props.tool, locale.value)
+  return mcpDisplayName(props.mcp, locale.value)
+})
+const isReleased = computed(() => props.mcp.status === "released")
+const showDeps = computed(() => props.mcp.depsCount >= 10)
 
 const tooltip = computed(() => {
-  const statusLabel = t(`mcpPanorama.status.${props.tool.status}.label`)
-  if (isReleased.value) return `${displayName.value} · ${t("mcpPanorama.detail.openInMarketplace")} →`
-  return `${displayName.value} · ${statusLabel} (${t("mcpPanorama.detail.notAvailable")})`
+  const statusLabel = t(`mcpPanorama.status.${props.mcp.status}.label`)
+  const toolName = toolDisplayName(props.tool, locale.value)
+  const ctx = displayName.value === toolName ? "" : ` · ${toolName}`
+  if (isReleased.value) {
+    return `${displayName.value}${ctx} · ${t("mcpPanorama.detail.openInMarketplace")} →`
+  }
+  return `${displayName.value}${ctx} · ${statusLabel} (${t("mcpPanorama.detail.notAvailable")})`
 })
 
 const baseClass = computed(() => [
   "group inline-flex items-center gap-1.5 rounded-md text-[12px] leading-tight font-medium tracking-tight no-underline relative shrink-0 transition-all border",
   // status colors
-  props.tool.status === "released"
+  props.mcp.status === "released"
     && "bg-(--color-status-released-bg) text-(--color-status-released) border-(--color-status-released)/20 border-l-[3px] border-l-(--color-status-released)",
-  props.tool.status === "dev"
+  props.mcp.status === "dev"
     && "bg-(--color-status-dev-bg) text-(--color-status-dev) border-(--color-status-dev)/20 border-l-[3px] border-l-(--color-status-dev)",
-  props.tool.status === "none"
+  props.mcp.status === "none"
     && "bg-(--color-status-none-bg) text-(--color-status-none) border-(--color-status-none)/20 border-l-[3px] border-l-(--color-status-none)",
   // density
   props.compact ? "px-[7px] py-[3px] text-[11px]" : "px-[9px] py-[5px]",
@@ -45,16 +60,19 @@ const baseClass = computed(() => [
 ])
 
 function onClick(e: MouseEvent) {
-  // Allow native open-in-new-tab for cmd/ctrl/shift/middle-click.
   if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return
-  emit("pick", props.tool)
+  emit("pick", { tool: props.tool, mcp: props.mcp })
+}
+
+function onStaticPick() {
+  emit("pick", { tool: props.tool, mcp: props.mcp })
 }
 </script>
 
 <template>
   <NuxtLink
-    v-if="isReleased && tool.extensionSlug"
-    :to="localePath(`/extensions/${tool.extensionSlug}`)"
+    v-if="isReleased && mcp.extensionSlug"
+    :to="localePath(`/extensions/${mcp.extensionSlug}`)"
     :title="tooltip"
     :class="baseClass"
     @click="onClick"
@@ -63,23 +81,25 @@ function onClick(e: MouseEvent) {
     <span
       v-if="showDeps"
       class="font-mono text-[9px] font-semibold rounded px-1 py-0 bg-(--color-status-released) text-(--color-card)"
-    >{{ tool.depsCount }}</span>
+    >{{ mcp.depsCount }}</span>
     <ChevronRight :size="9" class="shrink-0 opacity-70" aria-hidden="true" />
   </NuxtLink>
-  <span
+  <button
     v-else
+    type="button"
     :title="tooltip"
-    aria-disabled="true"
-    :class="[...baseClass, 'select-none cursor-default']"
+    :aria-disabled="mcp.isPlaceholder ? 'true' : undefined"
+    :class="[...baseClass, 'cursor-pointer']"
+    @click="onStaticPick"
   >
     <span class="whitespace-nowrap shrink-0">{{ displayName }}</span>
     <span
       v-if="showDeps"
       class="font-mono text-[9px] font-semibold rounded px-1 py-0 text-(--color-card)"
       :class="[
-        tool.status === 'dev' && 'bg-(--color-status-dev)',
-        tool.status === 'none' && 'bg-(--color-status-none)',
+        mcp.status === 'dev' && 'bg-(--color-status-dev)',
+        mcp.status === 'none' && 'bg-(--color-status-none)',
       ]"
-    >{{ tool.depsCount }}</span>
-  </span>
+    >{{ mcp.depsCount }}</span>
+  </button>
 </template>

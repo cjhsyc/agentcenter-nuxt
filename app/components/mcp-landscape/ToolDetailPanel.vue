@@ -1,35 +1,53 @@
 <script setup lang="ts">
 import { ArrowRight, Factory, Globe2, Link2, X } from "lucide-vue-next"
 import {
-  toolDisplayBlurb,
+  mcpDisplayBlurb,
+  mcpDisplayName,
   toolDisplayName,
   type Group,
+  type McpDto,
   type ToolDto,
 } from "~~/shared/mcp-panorama"
 import StatusPill from "./StatusPill.vue"
 
 const props = defineProps<{
-  tool: ToolDto | null
+  active: { tool: ToolDto; mcp: McpDto } | null
   groups: Group[]
 }>()
 
-const emit = defineEmits<{ close: [] }>()
+const emit = defineEmits<{
+  close: []
+  "switch-mcp": [{ tool: ToolDto; mcp: McpDto }]
+}>()
 
 const { locale, t } = useI18n()
 const localePath = useLocalePath()
 
-const open = computed(() => props.tool !== null)
+const open = computed(() => props.active !== null)
+const tool = computed(() => props.active?.tool ?? null)
+const mcp = computed(() => props.active?.mcp ?? null)
 
-const displayName = computed(() => (props.tool ? toolDisplayName(props.tool, locale.value) : ""))
-const displayBlurb = computed(() => (props.tool ? toolDisplayBlurb(props.tool, locale.value) : ""))
+const toolName = computed(() =>
+  tool.value ? toolDisplayName(tool.value, locale.value) : "",
+)
+const mcpName = computed(() =>
+  mcp.value
+    ? mcp.value.isPlaceholder
+      ? toolName.value
+      : mcpDisplayName(mcp.value, locale.value)
+    : "",
+)
+const mcpBlurb = computed(() =>
+  mcp.value ? mcpDisplayBlurb(mcp.value, locale.value) : "",
+)
 
 const ownerSummary = computed(() => {
-  if (!props.tool) return ""
-  const g = props.groups.find((x) => x.key === props.tool!.ownerPrimary)
-  if (!g) return props.tool.ownerPrimary
+  if (!tool.value) return ""
+  const g = props.groups.find((x) => x.key === tool.value!.ownerPrimary)
+  if (!g) return tool.value.ownerPrimary
   const primaryLabel = locale.value === "zh" ? g.labelZh : g.label
-  if (props.tool.ownerSecondary && g.kind === "domain") {
-    const pdt = g.pdts.find((p) => p.key === props.tool!.ownerSecondary)
+  if (tool.value.ownerSecondary && g.kind === "domain") {
+    const pdt = g.pdts.find((p) => p.key === tool.value!.ownerSecondary)
     if (pdt) {
       const pdtLabel = locale.value === "zh" ? pdt.labelZh : pdt.label
       return `${primaryLabel} · ${pdtLabel}`
@@ -39,37 +57,58 @@ const ownerSummary = computed(() => {
 })
 
 const ownerLayer = computed<"industry" | "public">(() => {
-  if (!props.tool) return "public"
-  return props.tool.ownerSecondary ? "public" : props.groups.find((g) => g.key === props.tool?.ownerPrimary)?.kind === "domain" ? "public" : "industry"
+  if (!tool.value) return "public"
+  if (tool.value.ownerSecondary) return "public"
+  return props.groups.find((g) => g.key === tool.value?.ownerPrimary)?.kind === "domain"
+    ? "public"
+    : "industry"
 })
 
 const endpoint = computed(() =>
-  props.tool && props.tool.status === "released"
-    ? `mcp://${props.tool.slug}`
+  mcp.value && mcp.value.status === "released"
+    ? `mcp://${mcp.value.slug}`
     : t("mcpPanorama.detail.notAvailable"),
 )
 
-const downstreams = computed<ToolDto[]>(() => {
-  if (!props.tool) return []
+const siblingMcps = computed<McpDto[]>(() => {
+  if (!tool.value || !mcp.value) return []
+  return tool.value.mcps.filter(
+    (m) => m.id !== mcp.value!.id && !m.isPlaceholder,
+  )
+})
+
+const downstreams = computed<{ tool: ToolDto; mcp: McpDto }[]>(() => {
+  if (!tool.value || !mcp.value) return []
   // Deterministic pick from across the groups, capped at min(deps, 5) — purely
   // illustrative dependency list for the side panel. Walks the pool linearly
-  // until n distinct tools are collected, so adjacent picks never collide.
-  const all = props.groups.flatMap((g) => g.items).filter((x) => x.id !== props.tool!.id)
+  // until n distinct MCPs are collected, so adjacent picks never collide.
+  const all: { tool: ToolDto; mcp: McpDto }[] = []
+  for (const g of props.groups) {
+    for (const t of g.items) {
+      for (const m of t.mcps) {
+        if (m.id !== mcp.value.id && !m.isPlaceholder) all.push({ tool: t, mcp: m })
+      }
+    }
+  }
   if (all.length === 0) return []
-  const target = Math.min(props.tool.depsCount, 5, all.length)
-  const out: ToolDto[] = []
+  const target = Math.min(mcp.value.depsCount, 5, all.length)
+  const out: { tool: ToolDto; mcp: McpDto }[] = []
   const seen = new Set<number>()
-  let i = props.tool.id * 7
+  let i = mcp.value.id * 7
   while (out.length < target) {
-    const candidate = all[i % all.length]!
-    if (!seen.has(candidate.id)) {
-      seen.add(candidate.id)
+    const candidate = all[((i % all.length) + all.length) % all.length]!
+    if (!seen.has(candidate.mcp.id)) {
+      seen.add(candidate.mcp.id)
       out.push(candidate)
     }
     i += 13
   }
   return out
 })
+
+function pickMcp(t: ToolDto, m: McpDto) {
+  emit("switch-mcp", { tool: t, mcp: m })
+}
 </script>
 
 <template>
@@ -78,7 +117,7 @@ const downstreams = computed<ToolDto[]>(() => {
     :class="open ? 'border-l-2 border-(--color-accent) shadow-[-20px_0_40px_-20px_rgba(40,28,15,0.18)]' : ''"
     :style="{ width: open ? '440px' : '0' }"
   >
-    <template v-if="tool">
+    <template v-if="tool && mcp">
       <!-- Header -->
       <div class="px-6 pt-5 pb-4 border-b border-(--color-border) flex flex-col gap-3">
         <div class="flex justify-between items-start gap-3">
@@ -94,11 +133,22 @@ const downstreams = computed<ToolDto[]>(() => {
                 <Globe2 v-else :size="10" aria-hidden="true" />
                 {{ t(`mcpPanorama.layer.${ownerLayer}Short`) }}
               </span>
-              <StatusPill :status="tool.status" size="sm" />
+              <StatusPill :status="mcp.status" size="sm" />
             </div>
-            <h2 class="font-serif text-[28px] font-medium text-(--color-ink) tracking-tight leading-[1.1] m-0">
-              {{ displayName }}
+            <div class="font-mono text-[11px] tracking-wide uppercase text-(--color-ink-muted)">
+              {{ t("mcpPanorama.detail.toolContext") }}
+            </div>
+            <h2 class="font-serif text-[24px] font-medium text-(--color-ink) tracking-tight leading-[1.15] m-0">
+              {{ toolName }}
             </h2>
+            <div v-if="!mcp.isPlaceholder" class="flex flex-col gap-0.5 mt-1">
+              <span class="font-mono text-[11px] tracking-wide uppercase text-(--color-ink-muted)">
+                {{ t("mcpPanorama.detail.mcp") }}
+              </span>
+              <span class="font-mono text-[15px] font-semibold text-(--color-ink) tracking-tight break-all">
+                {{ mcpName }}
+              </span>
+            </div>
             <div class="text-[12px] text-(--color-ink-muted) font-mono">{{ ownerSummary }}</div>
           </div>
           <button
@@ -110,7 +160,7 @@ const downstreams = computed<ToolDto[]>(() => {
             <X :size="16" />
           </button>
         </div>
-        <p class="text-[14px] text-(--color-ink-muted) leading-snug m-0">{{ displayBlurb }}</p>
+        <p class="text-[14px] text-(--color-ink-muted) leading-snug m-0">{{ mcpBlurb }}</p>
       </div>
 
       <!-- Status description -->
@@ -119,7 +169,7 @@ const downstreams = computed<ToolDto[]>(() => {
           {{ t("mcpPanorama.detail.mcpStatus") }}
         </div>
         <div class="text-[13px] text-(--color-ink) leading-snug">
-          {{ t(`mcpPanorama.status.${tool.status}.desc`) }}
+          {{ t(`mcpPanorama.status.${mcp.status}.desc`) }}
         </div>
       </div>
 
@@ -130,7 +180,7 @@ const downstreams = computed<ToolDto[]>(() => {
             {{ t("mcpPanorama.detail.dependents") }}
           </span>
           <span class="text-[13px] text-(--color-ink) truncate">
-            {{ t("mcpPanorama.detail.depsCount", { count: tool.depsCount }) }}
+            {{ t("mcpPanorama.detail.depsCount", { count: mcp.depsCount }) }}
           </span>
         </div>
         <div class="flex flex-col gap-1 min-w-0">
@@ -147,10 +197,37 @@ const downstreams = computed<ToolDto[]>(() => {
         </div>
       </div>
 
+      <!-- Other MCPs in this tool -->
+      <div
+        v-if="siblingMcps.length > 0"
+        class="px-6 py-4 border-b border-(--color-border)"
+      >
+        <div class="font-mono text-[11px] tracking-wide uppercase text-(--color-ink-muted) mb-2.5">
+          {{ t("mcpPanorama.detail.otherMcps") }}
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <button
+            v-for="s in siblingMcps"
+            :key="s.id"
+            type="button"
+            class="flex items-center justify-between p-2 border border-(--color-border) rounded-md gap-2 bg-transparent text-left cursor-pointer hover:border-(--color-ink-muted) transition"
+            @click="pickMcp(tool, s)"
+          >
+            <div class="min-w-0 flex items-center gap-2">
+              <span class="font-mono text-(--color-ink-muted) text-[14px] leading-none shrink-0" aria-hidden="true">·</span>
+              <span class="font-mono text-[13px] font-medium text-(--color-ink) truncate break-all">
+                {{ mcpDisplayName(s, locale) }}
+              </span>
+            </div>
+            <StatusPill :status="s.status" size="sm" />
+          </button>
+        </div>
+      </div>
+
       <!-- Downstream tools -->
       <div class="px-6 py-4 flex-1 overflow-auto">
         <div class="font-mono text-[11px] tracking-wide uppercase text-(--color-ink-muted) mb-2.5">
-          {{ t("mcpPanorama.detail.downstream", { count: tool.depsCount }) }}
+          {{ t("mcpPanorama.detail.downstream", { count: mcp.depsCount }) }}
         </div>
         <div v-if="downstreams.length === 0" class="text-[13px] text-(--color-ink-muted) italic">
           {{ t("mcpPanorama.detail.empty") }}
@@ -158,21 +235,21 @@ const downstreams = computed<ToolDto[]>(() => {
         <div v-else class="flex flex-col gap-1.5">
           <div
             v-for="d in downstreams"
-            :key="d.id"
+            :key="d.mcp.id"
             class="flex items-center justify-between p-2 border border-(--color-border) rounded-md gap-2"
           >
             <div class="min-w-0 flex items-center gap-2">
               <span class="font-mono text-(--color-ink-muted) text-[14px] leading-none shrink-0" aria-hidden="true">·</span>
               <div class="min-w-0 flex flex-col gap-0.5">
                 <span class="text-[13px] font-medium text-(--color-ink) truncate">
-                  {{ toolDisplayName(d, locale) }}
+                  {{ mcpDisplayName(d.mcp, locale) }}
                 </span>
                 <span class="text-[10px] text-(--color-ink-muted) font-mono truncate">
-                  {{ d.ownerPrimary }}<span v-if="d.ownerSecondary"> · {{ d.ownerSecondary }}</span>
+                  {{ toolDisplayName(d.tool, locale) }} · {{ d.tool.ownerPrimary }}<span v-if="d.tool.ownerSecondary"> · {{ d.tool.ownerSecondary }}</span>
                 </span>
               </div>
             </div>
-            <StatusPill :status="d.status" size="sm" />
+            <StatusPill :status="d.mcp.status" size="sm" />
           </div>
         </div>
       </div>
@@ -180,8 +257,8 @@ const downstreams = computed<ToolDto[]>(() => {
       <!-- Footer actions -->
       <div class="px-6 py-3.5 border-t border-(--color-border) flex gap-2 bg-(--color-bg)">
         <NuxtLink
-          v-if="tool.status === 'released' && tool.extensionSlug"
-          :to="localePath(`/extensions/${tool.extensionSlug}`)"
+          v-if="mcp.status === 'released' && mcp.extensionSlug"
+          :to="localePath(`/extensions/${mcp.extensionSlug}`)"
           class="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-md text-[13px] font-medium bg-(--color-accent) text-(--color-accent-fg) cursor-pointer no-underline"
         >
           <ArrowRight :size="12" aria-hidden="true" />
@@ -192,7 +269,7 @@ const downstreams = computed<ToolDto[]>(() => {
           type="button"
           class="flex-1 px-3.5 py-2 rounded-md text-[13px] font-medium bg-(--color-card) text-(--color-ink) border border-(--color-ink-muted) cursor-pointer"
         >
-          {{ tool.status === "dev" ? t("mcpPanorama.detail.trackProgress") : t("mcpPanorama.detail.requestBuild") }}
+          {{ mcp.status === "dev" ? t("mcpPanorama.detail.trackProgress") : t("mcpPanorama.detail.requestBuild") }}
         </button>
         <button
           type="button"

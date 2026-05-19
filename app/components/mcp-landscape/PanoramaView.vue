@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import type { Group, GroupStats, Layer, ToolDto } from "~~/shared/mcp-panorama"
+import type {
+  Group,
+  GroupStats,
+  Layer,
+  McpDto,
+  ToolDto,
+} from "~~/shared/mcp-panorama"
 import DomainCard from "./DomainCard.vue"
 import LayerSummary from "./LayerSummary.vue"
 import SectorCard from "./SectorCard.vue"
@@ -8,9 +14,9 @@ const props = defineProps<{
   layer: Layer
   stats: GroupStats
   groups: Group[]
-  activeId: number | null
+  activeMcpId: number | null
 }>()
-const emit = defineEmits<{ pick: [ToolDto] }>()
+const emit = defineEmits<{ pick: [{ tool: ToolDto; mcp: McpDto }] }>()
 
 const gridCols = computed(() =>
   props.layer === "industry"
@@ -27,14 +33,14 @@ const gridCols = computed(() =>
         <SectorCard
           v-if="g.kind === 'sector'"
           :group="g"
-          :active-id="activeId"
-          @pick="(t) => emit('pick', t)"
+          :active-mcp-id="activeMcpId"
+          @pick="(p) => emit('pick', p)"
         />
         <DomainCard
           v-else
           :group="g"
-          :active-id="activeId"
-          @pick="(t) => emit('pick', t)"
+          :active-mcp-id="activeMcpId"
+          @pick="(p) => emit('pick', p)"
         />
       </template>
     </div>

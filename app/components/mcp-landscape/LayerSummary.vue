@@ -48,7 +48,7 @@ function title(g: Group | null): string {
           {{ layerLabel }}
         </span>
         <span class="text-[11px] text-(--color-ink-muted)">
-          {{ t("mcpPanorama.summary.groupsCount", { groups: groups.length, tools: stats.total }) }}
+          {{ t("mcpPanorama.summary.groupsCount", { groups: groups.length, mcps: stats.total }) }}
         </span>
       </div>
       <div class="font-serif text-[36px] font-medium text-(--color-ink) leading-none tracking-tight">
