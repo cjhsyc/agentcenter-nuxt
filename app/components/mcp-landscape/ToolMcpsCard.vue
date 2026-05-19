@@ -22,17 +22,6 @@ const realMcpCount = computed(
   () => props.tool.mcps.filter((m) => !m.isPlaceholder).length,
 )
 
-const rollupBorderClass = computed(() => {
-  switch (props.tool.rollupStatus) {
-    case "released":
-      return "border-l-(--color-status-released)"
-    case "dev":
-      return "border-l-(--color-status-dev)"
-    default:
-      return "border-l-(--color-status-none)"
-  }
-})
-
 const rollupDotClass = computed(() => {
   switch (props.tool.rollupStatus) {
     case "released":
@@ -51,11 +40,10 @@ const rollupAriaLabel = computed(() =>
 
 <template>
   <article
-    class="bg-(--color-card) border border-(--color-border) border-l-[3px] rounded-md px-2.5 py-2 flex flex-col gap-1.5 transition hover:border-(--color-ink-muted)/40"
-    :class="rollupBorderClass"
+    class="bg-(--color-card) border border-(--color-border)/60 rounded-lg shadow-[0_1px_2px_rgba(60,40,20,0.04)] px-3 py-2.5 flex flex-col gap-1.5 transition hover:shadow-[0_2px_6px_rgba(60,40,20,0.07)] hover:border-(--color-border)"
   >
     <header class="flex items-center gap-2 min-w-0">
-      <span class="font-serif text-[13px] font-medium tracking-tight text-(--color-ink) truncate">
+      <span class="font-serif text-[13.5px] font-medium tracking-tight text-(--color-ink) truncate">
         {{ toolName }}
       </span>
       <span
@@ -69,7 +57,7 @@ const rollupAriaLabel = computed(() =>
         :aria-label="rollupAriaLabel"
       />
     </header>
-    <div class="flex flex-wrap gap-1">
+    <div class="flex flex-wrap gap-1.5">
       <McpTile
         v-for="mcp in tool.mcps"
         :key="mcp.id"

@@ -55,7 +55,9 @@ describe("McpTile", () => {
     expect(wrapper.find("button").text()).toContain("dt-mcp")
   })
 
-  it("placeholder MCP renders the tool name and is flagged aria-disabled", async () => {
+  it("placeholder MCP renders a quiet em-dash pill flagged aria-disabled", async () => {
+    // Tool name lives in the card header above; the pill just signals
+    // "no MCP yet" with an em-dash to avoid duplicating the tool name.
     const tool = makeTool({ name: "RefactorBot" })
     const mcp = makeMcp({
       id: -tool.id, slug: tool.slug, name: tool.name,
@@ -67,7 +69,8 @@ describe("McpTile", () => {
     })
     const btn = wrapper.find("button[aria-disabled=\"true\"]")
     expect(btn.exists()).toBe(true)
-    expect(btn.text()).toContain("RefactorBot")
+    expect(btn.text()).toContain("—")
+    expect(btn.text()).not.toContain("RefactorBot")
   })
 
   it("shows deps badge only when depsCount >= 10", async () => {
