@@ -47,7 +47,7 @@ function formatCount(n: number): string {
 
 <template>
   <article
-    class="group relative flex flex-col gap-2 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-4 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-(--color-accent)/30 hover:shadow-[0_2px_10px_-4px_oklch(0_0_0_/_0.08)]"
+    class="group relative flex flex-col gap-2 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-5 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-(--color-accent)/30 hover:shadow-[0_2px_10px_-4px_oklch(0_0_0_/_0.08)]"
   >
     <div class="flex items-center gap-3">
       <div
@@ -79,7 +79,7 @@ function formatCount(n: number): string {
     <p
       v-if="desc"
       class="text-(--color-ink-muted) text-[13px] leading-[1.55] overflow-hidden"
-      style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"
+      style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;"
     >
       {{ desc }}
     </p>

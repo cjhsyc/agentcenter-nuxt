@@ -5,12 +5,12 @@ withDefaults(defineProps<{ count?: number }>(), { count: 8 })
 <template>
   <div
     aria-hidden="true"
-    class="grid animate-pulse grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4"
+    class="grid animate-pulse grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
   >
     <div
       v-for="i in count"
       :key="i"
-      class="flex flex-col gap-2 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-4"
+      class="flex flex-col gap-2 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-5"
     >
       <div class="flex items-center gap-3">
         <div class="size-11 shrink-0 rounded-[8px] bg-(--color-border)/40" />
