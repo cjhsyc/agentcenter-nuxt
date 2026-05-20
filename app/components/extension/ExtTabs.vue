@@ -32,43 +32,58 @@ const permissionEntries = computed(() => {
     </TabsList>
 
     <TabsContent value="overview">
-      <Markdown v-if="readmeMd" :source="readmeMd" class="mt-4" />
-      <p v-else class="mt-4 text-(--color-ink-muted) italic">{{ t("extensions.noReadme") }}</p>
-      <div v-if="tagIds.length > 0" class="mt-8 flex flex-wrap gap-1.5">
-        <span
-          v-for="tag in tagIds"
-          :key="tag"
-          class="border border-(--color-border) text-(--color-ink-muted) rounded px-2 py-0.5 font-mono text-[11px] font-semibold"
+      <div
+        class="mt-4 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-6"
+      >
+        <Markdown v-if="readmeMd" :source="readmeMd" />
+        <p v-else class="text-(--color-ink-muted) italic">{{ t("extensions.noReadme") }}</p>
+        <div
+          v-if="tagIds.length > 0"
+          class="mt-6 flex flex-wrap gap-1.5 border-t border-(--color-border) pt-4"
         >
-          #{{ tagLabel(tag, locale as Locale) }}
-        </span>
+          <span
+            v-for="tag in tagIds"
+            :key="tag"
+            class="border border-(--color-border) text-(--color-ink-muted) rounded px-2 py-0.5 font-mono text-[11px] font-semibold"
+          >
+            #{{ tagLabel(tag, locale as Locale) }}
+          </span>
+        </div>
       </div>
     </TabsContent>
 
     <TabsContent value="setup">
-      <p class="mt-4 mb-2 text-sm text-(--color-ink-muted)">
-        {{ t("extensions.setupHint") }}
-      </p>
-      <InstallCommand :command="installCommand" />
+      <div
+        class="mt-4 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-6"
+      >
+        <p class="mb-3 text-sm text-(--color-ink-muted)">
+          {{ t("extensions.setupHint") }}
+        </p>
+        <InstallCommand :command="installCommand" />
+      </div>
     </TabsContent>
 
     <TabsContent value="permissions">
-      <ul
-        v-if="permissionEntries.length > 0"
-        class="mt-4 space-y-1.5 text-sm"
+      <div
+        class="mt-4 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-6"
       >
-        <li
-          v-for="key in permissionEntries"
-          :key="key"
-          class="flex items-center gap-2 text-(--color-ink)"
+        <ul
+          v-if="permissionEntries.length > 0"
+          class="space-y-1.5 text-sm"
         >
-          <span class="size-1.5 rounded-full bg-(--color-accent)" />
-          {{ t(`publish.wizard.listing.permissions.${key}`, key) }}
-        </li>
-      </ul>
-      <p v-else class="mt-4 text-sm text-(--color-ink-muted)">
-        {{ t("extensions.noPermissions") }}
-      </p>
+          <li
+            v-for="key in permissionEntries"
+            :key="key"
+            class="flex items-center gap-2 text-(--color-ink)"
+          >
+            <span class="size-1.5 rounded-full bg-(--color-accent)" />
+            {{ t(`publish.wizard.listing.permissions.${key}`, key) }}
+          </li>
+        </ul>
+        <p v-else class="text-sm text-(--color-ink-muted)">
+          {{ t("extensions.noPermissions") }}
+        </p>
+      </div>
     </TabsContent>
   </Tabs>
 </template>
