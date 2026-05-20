@@ -27,7 +27,7 @@ These mirror the original v1 product decisions. Same numbering; do not revisit i
 
 1. **Multi-tenant schema, single-tenant UI** for v1.
 2. **Themes**: Editorial Ivory (default) + Dark + Mono Clean. Selectable via the TopBar theme picker; persisted in a `theme` cookie.
-3. **Filter UI**: Mode B (drawer-style multi-row) only.
+3. **Filter UI**: single-row quiet pill rail (revised 2026-05-21, replacing the earlier "Mode B (drawer-style multi-row) only" decision). Scope pills + Dept/Creator/Publisher pickers + Tag-drawer trigger live inline on one row of compact bordered pills with no `border-b` divider below. The Tag drawer's expanded panel still wraps to a new row when opened — drawer behavior is retained for tag *selection* only, not for the rail as a whole.
 4. **Sign-up**: open. SSO/invite-only later if needed.
 5. **Locale URLs**: always prefixed; no implicit default.
 6. **Detail page README**: raw markdown stored, server-rendered with markdown-it + DOMPurify. Manifest metadata (homepage, repo, license, compatibility, screenshots) rendered as a side panel.
