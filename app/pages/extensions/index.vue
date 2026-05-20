@@ -6,7 +6,7 @@ const route = useRoute()
 const { filters } = useFilters()
 const localePath = useLocalePath()
 
-const { data, refresh } = await useFetch("/api/internal/extensions", {
+const { data, pending, refresh } = await useFetch("/api/internal/extensions", {
   query: computed(() => route.query),
   default: () => ({ items: [], total: 0, filters: {} }),
 })
@@ -31,14 +31,9 @@ const isMcpCategory = computed(() => route.query.category === "mcp")
 <template>
   <div class="px-6 py-8 max-w-7xl mx-auto">
     <header class="mb-6 flex items-end justify-between gap-4 flex-wrap">
-      <div>
-        <h1 class="font-serif text-3xl tracking-tight text-(--color-ink)">
-          {{ t("extensions.browseTitle") }}
-        </h1>
-        <p class="mt-1 text-sm text-(--color-ink-muted)">
-          {{ t("extensions.count", { count: total }) }}
-        </p>
-      </div>
+      <h1 class="font-serif text-3xl tracking-tight text-(--color-ink)">
+        {{ t("extensions.browseTitle") }}
+      </h1>
       <NuxtLink
         v-if="isMcpCategory"
         :to="localePath('/mcp-panorama')"
@@ -55,7 +50,16 @@ const isMcpCategory = computed(() => route.query.category === "mcp")
       :tags="facets.tags"
     />
 
+    <ResultsSummary
+      :count="total"
+      :creators="facets.creators"
+      :publishers="facets.publishers"
+      :tags="facets.tags"
+    />
+
+    <ExtGridSkeleton v-if="pending && items.length === 0" />
     <ExtGrid
+      v-else
       :items="items"
       :query="query"
       :clear-filters-href="filtersActive ? localePath('/extensions') : undefined"

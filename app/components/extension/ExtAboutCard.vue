@@ -34,9 +34,11 @@ const publishedLabel = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-5">
-    <h2 class="text-sm font-semibold mb-3 text-(--color-ink)">{{ t("extensions.about") }}</h2>
-    <dl class="space-y-2 text-sm">
+  <div class="rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-6">
+    <h2 class="font-serif text-base font-semibold tracking-tight mb-4 text-(--color-ink)">
+      {{ t("extensions.about") }}
+    </h2>
+    <dl class="space-y-2.5 text-[13px]">
       <div v-if="licenseSpdx" class="flex justify-between">
         <dt class="text-(--color-ink-muted)">{{ t("extensions.license") }}</dt>
         <dd class="font-mono text-(--color-ink)">{{ licenseSpdx }}</dd>
@@ -47,19 +49,19 @@ const publishedLabel = computed(() => {
       </div>
       <div v-if="publishedLabel" class="flex justify-between">
         <dt class="text-(--color-ink-muted)">{{ t("extensions.published") }}</dt>
-        <dd class="text-(--color-ink)">{{ publishedLabel }}</dd>
+        <dd class="font-mono text-(--color-ink)">{{ publishedLabel }}</dd>
       </div>
     </dl>
     <div
       v-if="safeHomepage || safeRepo"
-      class="mt-4 pt-4 border-t border-(--color-border) space-y-2"
+      class="mt-5 pt-5 border-t border-(--color-border) space-y-2.5"
     >
       <a
         v-if="safeHomepage"
         :href="safeHomepage"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-2 text-sm text-(--color-ink) hover:text-(--color-accent)"
+        class="flex items-center gap-2 text-[13px] text-(--color-ink) hover:text-(--color-accent)"
       >
         <ExternalLink :size="14" aria-hidden="true" />
         {{ t("extensions.homepage") }}
@@ -69,7 +71,7 @@ const publishedLabel = computed(() => {
         :href="safeRepo"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-2 text-sm text-(--color-ink) hover:text-(--color-accent)"
+        class="flex items-center gap-2 text-[13px] text-(--color-ink) hover:text-(--color-accent)"
       >
         <Github :size="14" aria-hidden="true" />
         {{ t("extensions.repository") }}

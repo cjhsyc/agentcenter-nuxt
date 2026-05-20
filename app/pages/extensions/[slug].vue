@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { ArrowLeft } from "lucide-vue-next"
+
 const route = useRoute()
-const { locale } = useI18n()
+const { t, locale } = useI18n()
+const localePath = useLocalePath()
 const requestUrl = useRequestURL()
 
 const slug = computed(() => String(route.params.slug ?? ""))
@@ -43,6 +46,14 @@ defineOgImageComponent("Frame", {
 
 <template>
   <div class="px-6 py-8 max-w-7xl mx-auto">
+    <NuxtLink
+      :to="localePath('/extensions')"
+      class="mb-4 inline-flex items-center gap-1.5 text-[13px] text-(--color-ink-muted) transition-colors hover:text-(--color-ink)"
+    >
+      <ArrowLeft :size="14" aria-hidden="true" />
+      {{ t("extensions.backToBrowse") }}
+    </NuxtLink>
+
     <div class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
       <main class="min-w-0">
         <ExtHero

@@ -78,6 +78,12 @@
       "hintCheckBack": "市场不断扩充中，请稍后再来看看。",
       "clearFilters": "清除筛选"
     },
+    "summary": {
+      "showing": "共 {count} 个",
+      "showingZero": "暂无匹配",
+      "clearAll": "清除全部",
+      "removeFilter": "移除 {label} 筛选"
+    },
     "mcpPanoramaFeature": {
       "eyebrow": "MCP 全景图",
       "title": "MCP 化的全景视图",
@@ -86,7 +92,13 @@
       "statsFallback": "浏览所有工具、产业与领域",
       "cta": "进入全景图"
     },
-    "mcpPanoramaLink": "查看 MCP 全景图"
+    "mcpPanoramaLink": "查看 MCP 全景图",
+    "backToBrowse": "浏览扩展",
+    "badges": {
+      "official": "官方",
+      "popular": "热门",
+      "new": "新"
+    }
   },
   "sidebar": {
     "browse": "浏览",

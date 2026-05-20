@@ -61,9 +61,8 @@ agentcenter-nuxt/
 │   │   │   ├── InstallButton.vue      # triggers install event + CLI command hint
 │   │   │   ├── AddToGroup.vue
 │   │   │   └── FeaturedBanner.vue
-│   │   ├── filters/                   # Mode B (drawer)
+│   │   ├── filters/                   # single-row quiet pill rail (see CLAUDE.md decision #3)
 │   │   │   ├── FilterBar.vue
-│   │   │   ├── FilterChips.vue
 │   │   │   ├── DeptPicker.vue
 │   │   │   ├── ScopePills.vue
 │   │   │   ├── TagDrawer.vue
@@ -429,7 +428,7 @@ The `/api/v1/...` JSON shapes documented in the original `docs/api.md` are froze
 | **0. Bootstrap** | 0.5d | `bunx nuxi init`, Nuxt 4 compat, Tailwind v4 via `@nuxtjs/tailwindcss` (or `@tailwindcss/vite`), shadcn-vue init, `@nuxt/fonts`, `@nuxtjs/i18n` skeleton, `@nuxt/eslint`, `@pinia/nuxt`, Vitest + `@nuxt/test-utils`, Playwright. CI workflow (`bun run validate`). Adapted `CLAUDE.md` + this plan committed. |
 | **1. Visual shell** | 1.5d | `app.vue` + `default` layout, `TopBar` + `Sidebar`, theme tokens (Ivory + Dark) in `tailwind.css`, `ThemeSwitch` (cookie-backed, no flash on hydrate), `LocaleSwitch`. Static home pixel-matched to the prototype, statically renders. |
 | **2. DB + seed** | 1d | Port `shared/db/schema/*` from the original. Copy `drizzle/` migrations. `server/utils/db.ts` (postgres-js + Drizzle). `scripts/seed.ts` ported (Bun runnable). Working `useAsyncData` query on the home page. |
-| **3. Browse + filter (vertical-slice demo)** | 2d | `/[locale]/extensions/index.vue` with all filters wired through query string; `useFilters` composable; `ExtCard` + `ExtGrid`; `FilterBar` Mode B; `DeptPicker` popover; `SortSelect`. Home shows featured banner + first 6 + Browse All. **Anonymous browse works.** ← clickable demo URL by end of this phase |
+| **3. Browse + filter (vertical-slice demo)** | 2d | `/[locale]/extensions/index.vue` with all filters wired through query string; `useFilters` composable; `ExtCard` + `ExtGrid`; `FilterBar` (single-row quiet pill rail per decision #3); `DeptPicker` popover; `SortSelect`. Home shows featured banner + first 6 + Browse All. **Anonymous browse works.** ← clickable demo URL by end of this phase |
 | **4. Detail page** | 1d | `/[locale]/extensions/[slug].vue` — `Markdown.vue` (markdown-it + DOMPurify), metadata sidebar (homepage/repo/license/compat), version table, install button (placeholder, wired in Phase 9). Port `getExtensionBySlug`, `listExtensionVersions`, `getRelatedExtensions`. `ExtTabs.vue` over `reka-ui` tabs primitive. |
 | **5. i18n** | 1d | `@nuxtjs/i18n` wired, `en` + `zh` messages from prototype's `T`, locale switcher, locale-redirect middleware, always-prefixed URLs. |
 | **6. Auth** | 1.5d | Better Auth + Drizzle adapter, server handler at `server/api/auth/[...].ts`, sign-in/up pages, dept-pick onboarding, `getSessionUser()` / `requireUser()` helpers, protect publish/collection routes via named middleware. |
@@ -984,4 +983,4 @@ Same as the original. The data shapes from the prototype HTML are unchanged.
 - `EXTENSIONS` array → `shared/db/seed.ts` rows.
 - `MY_DEPT_ID` constant → comes from authenticated user's `defaultDeptId`.
 - `isDescendant(deptId, ancestorId)` → moves into the SQL query (`OR LIKE 'ancestor.%'`), no client-side recursion.
-- `FilterAreaB` (Mode B drawer) is the only filter mode to build.
+- Filter rail follows the single-row quiet pill design (see CLAUDE.md decision #3); only the Tag drawer panel retains drawer-style expansion.

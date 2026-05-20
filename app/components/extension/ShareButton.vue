@@ -38,7 +38,7 @@ onBeforeUnmount(() => { if (timer) clearTimeout(timer) })
 <template>
   <button
     type="button"
-    class="inline-flex items-center gap-1.5 rounded-md border border-(--color-border) bg-(--color-card) px-3 py-1.5 text-sm text-(--color-ink) hover:bg-(--color-sidebar)"
+    class="inline-flex items-center gap-1.5 rounded-md border border-(--color-border) bg-(--color-card) px-3.5 py-2 text-[14px] text-(--color-ink) hover:bg-(--color-sidebar)"
     @click="share"
   >
     <Share2 :size="14" aria-hidden="true" />

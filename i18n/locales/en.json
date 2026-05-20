@@ -78,6 +78,12 @@
       "hintCheckBack": "New extensions land here as the marketplace grows.",
       "clearFilters": "Clear filters"
     },
+    "summary": {
+      "showing": "Showing {count}",
+      "showingZero": "No matches",
+      "clearAll": "Clear all",
+      "removeFilter": "Remove {label} filter"
+    },
     "mcpPanoramaFeature": {
       "eyebrow": "MCP PANORAMA",
       "title": "The MCP adoption landscape",
@@ -86,7 +92,13 @@
       "statsFallback": "Browse every tool, sector, and domain",
       "cta": "Open the panorama"
     },
-    "mcpPanoramaLink": "View the MCP Panorama"
+    "mcpPanoramaLink": "View the MCP Panorama",
+    "backToBrowse": "Browse extensions",
+    "badges": {
+      "official": "Official",
+      "popular": "Popular",
+      "new": "New"
+    }
   },
   "sidebar": {
     "browse": "Browse",
