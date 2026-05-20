@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { Star } from "lucide-vue-next"
+import { deptPath } from "~~/shared/data/departments"
+import type { Locale } from "~~/shared/types"
+
 interface RelatedRow {
   id: string
   slug: string
@@ -6,6 +10,10 @@ interface RelatedRow {
   nameZh?: string | null
   iconEmoji: string | null
   iconColor: string | null
+  downloadsCount?: number
+  badge?: "official" | "popular" | "new" | null
+  deptId?: string | null
+  starsAvg?: string | null
 }
 
 const props = defineProps<{ related: RelatedRow[] }>()
@@ -13,9 +21,29 @@ const props = defineProps<{ related: RelatedRow[] }>()
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
 
+const BADGE_LABEL = { official: "Official", popular: "Popular", new: "New" } as const
+const BADGE_CLASS = {
+  official: "badge-official",
+  popular: "badge-popular",
+  new: "badge-new",
+} as const
+
 function labelFor(r: RelatedRow): string {
   if (locale.value === "zh" && r.nameZh) return r.nameZh
   return r.name
+}
+
+function deptLeafFor(r: RelatedRow): string | null {
+  if (!r.deptId) return null
+  const trail = deptPath(r.deptId, locale.value as Locale)
+  return trail.length > 0 ? (trail[trail.length - 1] ?? null) : null
+}
+
+function ratingFor(r: RelatedRow): string | null {
+  if (!r.starsAvg) return null
+  const n = Number(r.starsAvg)
+  if (Number.isNaN(n) || n <= 0) return null
+  return n.toFixed(1)
 }
 </script>
 
@@ -31,10 +59,38 @@ function labelFor(r: RelatedRow): string {
       <li v-for="r in props.related" :key="r.id">
         <NuxtLink
           :to="localePath(`/extensions/${r.slug}`)"
-          class="group flex items-center gap-3 hover:text-(--color-accent)"
+          class="group flex items-start gap-3"
         >
-          <span class="text-[18px]">{{ r.iconEmoji }}</span>
-          <span class="flex-1 truncate text-[13px] font-medium">{{ labelFor(r) }}</span>
+          <span class="shrink-0 text-[18px] leading-none mt-0.5">{{ r.iconEmoji }}</span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5">
+              <span class="truncate text-[13px] font-medium text-(--color-ink) group-hover:text-(--color-accent) transition-colors">
+                {{ labelFor(r) }}
+              </span>
+              <span
+                v-if="r.badge"
+                class="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold"
+                :class="BADGE_CLASS[r.badge]"
+              >
+                {{ BADGE_LABEL[r.badge] }}
+              </span>
+            </div>
+            <div
+              v-if="deptLeafFor(r) || ratingFor(r)"
+              class="mt-0.5 flex items-center gap-1.5 text-[11px] text-(--color-ink-muted)"
+            >
+              <span v-if="deptLeafFor(r)" class="truncate">{{ deptLeafFor(r) }}</span>
+              <span
+                v-if="deptLeafFor(r) && ratingFor(r)"
+                aria-hidden="true"
+                class="text-(--color-ink-muted)/50"
+              >·</span>
+              <span v-if="ratingFor(r)" class="inline-flex items-center gap-0.5">
+                <Star :size="10" class="fill-amber-500 text-amber-500" aria-hidden="true" />
+                <span class="font-mono">{{ ratingFor(r) }}</span>
+              </span>
+            </div>
+          </div>
         </NuxtLink>
       </li>
     </ul>

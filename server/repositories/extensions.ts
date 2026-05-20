@@ -86,6 +86,9 @@ const relatedSelect = {
   iconEmoji: extensions.iconEmoji,
   iconColor: extensions.iconColor,
   downloadsCount: extensions.downloadsCount,
+  badge: extensions.badge,
+  deptId: extensions.deptId,
+  starsAvg: extensions.starsAvg,
 }
 
 export async function findManyForList(
