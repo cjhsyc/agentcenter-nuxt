@@ -21,7 +21,6 @@ const props = defineProps<{ related: RelatedRow[] }>()
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
 
-const BADGE_LABEL = { official: "Official", popular: "Popular", new: "New" } as const
 const BADGE_CLASS = {
   official: "badge-official",
   popular: "badge-popular",
@@ -72,7 +71,7 @@ function ratingFor(r: RelatedRow): string | null {
                 class="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold"
                 :class="BADGE_CLASS[r.badge]"
               >
-                {{ BADGE_LABEL[r.badge] }}
+                {{ t(`extensions.badges.${r.badge}`) }}
               </span>
             </div>
             <div

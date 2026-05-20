@@ -93,7 +93,12 @@
       "cta": "进入全景图"
     },
     "mcpPanoramaLink": "查看 MCP 全景图",
-    "backToBrowse": "浏览扩展"
+    "backToBrowse": "浏览扩展",
+    "badges": {
+      "official": "官方",
+      "popular": "热门",
+      "new": "新"
+    }
   },
   "sidebar": {
     "browse": "浏览",

@@ -93,7 +93,12 @@
       "cta": "Open the panorama"
     },
     "mcpPanoramaLink": "View the MCP Panorama",
-    "backToBrowse": "Browse extensions"
+    "backToBrowse": "Browse extensions",
+    "badges": {
+      "official": "Official",
+      "popular": "Popular",
+      "new": "New"
+    }
   },
   "sidebar": {
     "browse": "Browse",

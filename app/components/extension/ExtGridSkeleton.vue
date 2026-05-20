@@ -5,7 +5,7 @@ withDefaults(defineProps<{ count?: number }>(), { count: 8 })
 <template>
   <div
     aria-hidden="true"
-    class="grid animate-pulse grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
+    class="grid animate-pulse grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
   >
     <div
       v-for="i in count"

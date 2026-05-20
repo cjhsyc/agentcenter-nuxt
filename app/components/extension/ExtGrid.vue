@@ -37,7 +37,7 @@ const filtersActive = computed(() => Boolean(props.query) || Boolean(props.clear
   </div>
   <div
     v-else
-    class="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
+    class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
   >
     <ExtCard v-for="ext in items" :key="ext.id" :ext="ext" />
   </div>

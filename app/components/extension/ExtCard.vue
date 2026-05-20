@@ -6,10 +6,9 @@ import type { Locale } from "~~/shared/types"
 
 const props = defineProps<{ ext: ExtensionListItem }>()
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 const localePath = useLocalePath()
 
-const BADGE_LABEL = { official: "Official", popular: "Popular", new: "New" } as const
 const BADGE_CLASS = {
   official: "badge-official",
   popular: "badge-popular",
@@ -43,6 +42,14 @@ function formatCount(n: number): string {
   if (n < 1000) return String(n)
   return `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k`
 }
+
+const ratingLabel = computed(() => {
+  const raw = props.ext.starsAvg
+  if (raw === null || raw === undefined || raw === "") return null
+  const n = Number(raw)
+  if (Number.isNaN(n)) return null
+  return n.toFixed(1)
+})
 </script>
 
 <template>
@@ -71,7 +78,7 @@ function formatCount(n: number): string {
           class="shrink-0 rounded px-1.5 py-0.5 text-[11px] font-semibold"
           :class="BADGE_CLASS[ext.badge]"
         >
-          {{ BADGE_LABEL[ext.badge] }}
+          {{ t(`extensions.badges.${ext.badge}`) }}
         </span>
       </div>
     </div>
@@ -94,11 +101,13 @@ function formatCount(n: number): string {
         <span class="truncate font-semibold">{{ deptLeaf }}</span>
       </span>
       <span v-if="deptLeaf" aria-hidden="true" class="text-(--color-ink-muted)/50">·</span>
-      <span class="inline-flex items-center gap-1">
-        <Star :size="12" class="fill-amber-500 text-amber-500" aria-hidden="true" />
-        <span class="font-semibold text-(--color-ink)">{{ Number(ext.starsAvg).toFixed(1) }}</span>
-      </span>
-      <span aria-hidden="true" class="text-(--color-ink-muted)/50">·</span>
+      <template v-if="ratingLabel">
+        <span class="inline-flex items-center gap-1">
+          <Star :size="12" class="fill-amber-500 text-amber-500" aria-hidden="true" />
+          <span class="font-semibold text-(--color-ink)">{{ ratingLabel }}</span>
+        </span>
+        <span aria-hidden="true" class="text-(--color-ink-muted)/50">·</span>
+      </template>
       <span class="inline-flex items-center gap-1">
         <Download :size="12" aria-hidden="true" />
         <span>{{ formatCount(ext.downloadsCount) }}</span>
