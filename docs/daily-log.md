@@ -12,6 +12,37 @@ What changed each day. For the current capability list, see [features.md](./feat
 
 ## English
 
+### 2026-05-21
+
+**Briefing.** Today's release brings an editorial pass to the extension list and detail pages — cards simplify into preview rectangles with a single meta line, the filter rail collapses to a quiet single row with dismissible state chips, the detail-page hero gains a stronger anchor and a confident primary CTA, and every tab body now sits inside its own framed card.
+
+<details>
+<summary>Details</summary>
+
+- **A simpler extension card** — Cards on the browse page drop the tag pills and the inline Install button. Each one now reads as a preview rectangle: a slightly larger icon, name + badge, a three-line description, and a single meta line carrying department, star rating, and download count. Clicking anywhere on the card opens the detail page where install lives. (#27)
+
+- **A quieter filter rail** — The browse filters collapse from three rows to a single line of compact pills. The hard divider beneath them is gone; active states are subtly tinted rather than ink-inverted; the "Scope:", "Department:", "Creator:", and "Publisher:" labels drop because the controls speak for themselves. The redundant Trending / New / Official / Open Source quick-filter row goes away — sort and the visible Official badge already cover the same ground. (#27)
+
+- **You can see and dismiss what's filtered** — A new strip between the filters and the grid shows the result count plus a chip for each active filter (search term, scope, department, creator, publisher, each selected tag); click the × to remove just that filter, or "Clear all" to drop them in one tap. The sort control moves to this strip too, where it logically belongs next to the count. (#27)
+
+- **Placeholder cards while results load** — First paint now shows eight subtle skeleton tiles in the grid rather than a blank space. (#27)
+
+- **A breadcrumb back to the list** — A small "← Browse extensions" link sits above every detail page, so deep-linked detail views have a clear way back without relying on browser history. (#27)
+
+- **A more confident detail hero** — Title shifts to a larger serif, description reads as a lede with more leading, the icon grows, and the stats line uses proper middle-dot separators. The Install button is now the page's clear primary action — larger, accent-filled — with Save and Share matching it in size but staying neutral. (#27)
+
+- **README and tab bodies in framed cards** — Overview, Setup, and Permissions each render inside their own bordered card matching the sidebar, so the main content reads with the same composed weight as the rest of the page. (#27)
+
+- **An editorial sidebar** — The About and Related panels gain serif headers, more breathing room, and refined typography. Related entries now show a badge, the owning department, and a star rating beside each name, so the recommendations feel like recommendations rather than an afterthought. (#27)
+
+- **Underline-on-active tabs** — Overview / Setup / Permissions switch from a subtle background swap to a clean ink underline beneath the active tab, making the current section unambiguous. (#27)
+
+- **Robust on narrow viewports and missing data** — The browse grid collapses to a single column below 640px wide instead of overflowing, the star rating displays nothing rather than "NaN" when an extension has no ratings yet, and Official / Popular / New badges now render in Chinese on `/zh` pages. (#27)
+
+</details>
+
+---
+
 ### 2026-05-19
 
 **Briefing.** Today's release reshapes the MCP Panorama around realistic multi-MCP tools — a software tool can now expose several MCP servers — and strips editorial labels from every group's stats in favour of the raw numbers, all of which double as one-click drill and filter actions.
@@ -101,6 +132,37 @@ What changed each day. For the current capability list, see [features.md](./feat
 ---
 
 ## 中文
+
+### 2026-05-21
+
+**简报。** 今日发布为扩展列表页与详情页带来编辑视觉精修——卡片简化为单行 meta 的预览矩形，筛选条折叠为安静的单行，并新增可逐项移除的筛选状态标签；详情页主视觉锚定更稳，安装按钮升格为页面的主操作；每个标签页正文都装入独立卡框。
+
+<details>
+<summary>详情</summary>
+
+- **更简洁的扩展卡** ——浏览页的卡片去掉了标签胶囊与内嵌的安装按钮。每张卡现在只读一组预览要素：稍大的图标、名称 + 徽章、三行描述，以及一行包含部门、星级与下载量的 meta。点击卡片任意位置即跳转到详情页，安装入口收归详情页。（#27）
+
+- **更安静的筛选条** ——浏览筛选从三行折叠为一行紧凑胶囊。下方的硬分割线移除；激活态由墨色反相改为淡淡的色调；不再标注"Scope:" / "Department:" / "Creator:" / "Publisher:"，控件本身已自解释。冗余的"热门 / 最新 / 官方 / 开源"快速筛选行也一并下线——排序下拉与卡片上可见的 Official 徽章已覆盖同样的语义。（#27）
+
+- **能看见且能逐项移除当前筛选** ——筛选条与网格之间新增一条状态带：左侧显示结果总数，紧跟一组代表每个生效筛选（搜索词、范围、部门、作者、发布商、每个选中标签）的可移除标签——点击 × 只移除该项，或点击"Clear all"一次全清。排序下拉也搬到这条状态带的右侧，与结果数同居一处。（#27）
+
+- **加载时的占位卡** ——首次渲染时网格会显示八张柔和的骨架占位，而非一片空白。（#27）
+
+- **一条回到列表的面包屑** ——每个详情页顶部都加上了一条"← 浏览扩展"链接，深度链接进入的详情页也能一键返回列表，不必依赖浏览器历史。（#27）
+
+- **更有分量的详情页主视觉** ——标题改为更大号的衬线，描述以 lede 字号呈现并加大行距，图标尺寸放大，统计行采用标准"·"分隔符。安装按钮成为页面唯一明确的主操作——更大、强调色填充——保存与分享尺寸相匹配但保持中性。（#27）
+
+- **README 与各标签内容装入卡框** —— Overview / Setup / Permissions 三个标签的正文各自置于带描边的卡内，与右侧边栏卡视觉对齐，主内容区读起来与页面其他元素一样从容。（#27）
+
+- **更编辑感的侧栏** —— About 与 Related 两块面板换为衬线标题，留白更宽，排版更克制。Related 列表的每一项现在带徽章、所属部门与星级，让推荐看起来是有意挑选的，而非附赠。（#27）
+
+- **激活下划线式标签页** —— Overview / Setup / Permissions 切换从轻微的背景换色改为干净的墨色下划线，当前所在标签一望即明。（#27）
+
+- **窄屏与缺数据下的稳健性** ——浏览网格在 640px 以下视口收为单列，不再横向溢出；扩展若尚无评分则不再显示"NaN"，而是直接省略星级；Official / Popular / New 徽章在 `/zh` 页面下也以中文显示。（#27）
+
+</details>
+
+---
 
 ### 2026-05-19
 

@@ -18,12 +18,12 @@ Source-of-truth list of what's shipped today, organized by capability area. For 
 - **Search** — Search by any phrase, in English or Chinese, including short fragments.
 - **Department picker** — Narrow to a department and all of its sub-departments.
 - **Scope filter** — Filter by Personal, Organization, or Enterprise.
-- **Quick filters** — Toggle Trending, New, Official, or Open Source.
 - **Tag filters** — Multi-select tags with "any" or "all" matching.
 - **Sort** — Sort by downloads, stars, or most recently updated.
 - **Creator filter** — Filter by the user who published the extension.
 - **Publisher filter** — Filter by the organization behind the extension.
 - **Shareable filter state** — Every filter combination is reflected in the URL, so any search can be bookmarked or shared.
+- **Active-filter chips** — Above the results grid, each applied filter (search term, scope, department, creator, publisher, every selected tag) renders as a removable chip — click × to drop one, or "Clear all" to clear them in a single tap.
 - **Home: featured spotlight** — A curated "Featured this week" extension anchors the home page with its name, tagline, install command, and a deep link to the detail page; falls back to a slim editorial card when no extension is marked featured.
 - **Home: trending row** — A cross-category mix of trending extensions (Skills, MCP servers, slash commands, plugins).
 - **Whole-card click** — Click anywhere on an extension card to open it; Save / Install stay independently clickable.
@@ -35,7 +35,7 @@ Source-of-truth list of what's shipped today, organized by capability area. For 
 - **Stats** — Average rating, downloads, version.
 - **Install command** — A one-click copyable CLI snippet on the Setup tab.
 - **Tabs** — Overview, Setup, Permissions. Permissions surfaces the network / files / runtime / data toggles the publisher declared.
-- **Related extensions** — A row of suggestions related to the current extension.
+- **Related extensions** — A sidebar list of suggestions related to the current extension, each carrying its badge, owning department, and star rating beside the name.
 - **Share** — A canonical link that's safe to share across hosts; uses the native share sheet on iOS / Android with a clipboard fallback elsewhere.
 
 ### MCP Panorama
@@ -125,12 +125,12 @@ Source-of-truth list of what's shipped today, organized by capability area. For 
 - **搜索** ——任意短语搜索，支持中英文，含短片段查询。
 - **部门选择器** ——收窄到某个部门及其所有子部门。
 - **范围筛选** ——按"个人 / 组织 / 企业"筛选。
-- **快速筛选** ——切换"热门 / 最新 / 官方 / 开源"。
 - **标签筛选** ——多选标签，支持"任意 / 全部"匹配。
 - **排序** ——按下载量、评分或最近更新排序。
 - **作者筛选** ——按发布扩展的用户筛选。
 - **发布商筛选** ——按背后的组织筛选。
 - **可分享的筛选状态** ——所有筛选条件都反映在 URL 中，可收藏或分享任意搜索。
+- **已生效筛选标签** ——结果网格上方为每个生效的筛选（搜索词、范围、部门、作者、发布商、每个选中标签）显示一个可移除的标签——点击 × 移除单项，或点击"Clear all"一次全清。
 - **首页：精选模块** ——首页顶部由一个真实的"本周精选"扩展担纲，展示其名称、宣传语、安装命令以及直达详情页的链接；若当前未标记任何精选，则回退到一张简洁的编辑卡片。
 - **首页：热门栏** ——跨类别混合展示热门扩展（Skill、MCP、斜杠命令、插件）。
 - **整卡可点击** ——点击扩展卡片任意位置都能打开；Save / Install 仍可独立点击。
@@ -142,7 +142,7 @@ Source-of-truth list of what's shipped today, organized by capability area. For 
 - **统计** ——平均评分、下载量、版本。
 - **安装命令** —— Setup 页签里提供一键可复制的 CLI 命令片段。
 - **Tabs** ——概览 / 安装 / 权限。权限页签展示发布者声明的网络 / 文件 / 运行时 / 数据访问开关。
-- **相关扩展** ——与当前扩展相关的推荐行。
+- **相关扩展** ——详情页侧栏列出与当前扩展相关的推荐，每条名称旁带徽章、所属部门与星级。
 - **分享** ——跨域名安全分享的规范链接；iOS / Android 调用系统分享面板，其他平台回退到剪贴板复制。
 
 ### MCP 全景图
