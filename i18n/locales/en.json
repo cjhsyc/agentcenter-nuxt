@@ -92,7 +92,8 @@
       "statsFallback": "Browse every tool, sector, and domain",
       "cta": "Open the panorama"
     },
-    "mcpPanoramaLink": "View the MCP Panorama"
+    "mcpPanoramaLink": "View the MCP Panorama",
+    "backToBrowse": "Browse extensions"
   },
   "sidebar": {
     "browse": "Browse",

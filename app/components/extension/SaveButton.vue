@@ -45,7 +45,7 @@ onBeforeUnmount(() => { if (resetTimer) clearTimeout(resetTimer) })
     type="button"
     :disabled="busy"
     :aria-label="saved ? t('common.saved') : t('common.save')"
-    class="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors disabled:opacity-60"
+    class="inline-flex items-center gap-1.5 rounded-md border px-3.5 py-2 text-[14px] transition-colors disabled:opacity-60"
     :class="saved
       ? 'border-(--color-accent) bg-(--color-accent)/10 text-(--color-accent)'
       : 'border-(--color-border) bg-(--color-card) text-(--color-ink) hover:bg-(--color-sidebar)'"

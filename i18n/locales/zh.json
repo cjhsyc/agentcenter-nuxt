@@ -92,7 +92,8 @@
       "statsFallback": "浏览所有工具、产业与领域",
       "cta": "进入全景图"
     },
-    "mcpPanoramaLink": "查看 MCP 全景图"
+    "mcpPanoramaLink": "查看 MCP 全景图",
+    "backToBrowse": "浏览扩展"
   },
   "sidebar": {
     "browse": "浏览",

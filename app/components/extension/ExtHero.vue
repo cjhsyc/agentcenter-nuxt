@@ -29,9 +29,9 @@ function formatCount(n: number): string {
 
 <template>
   <header class="mb-6">
-    <div class="flex items-start gap-4">
+    <div class="flex items-start gap-5">
       <div
-        class="flex size-14 shrink-0 items-center justify-center rounded-[10px] border-[1.5px] text-[24px]"
+        class="flex size-16 shrink-0 items-center justify-center rounded-[10px] border-[1.5px] text-[28px]"
         :style="{
           background: `${iconColor ?? '#888'}1c`,
           borderColor: `${iconColor ?? '#888'}33`,
@@ -40,24 +40,33 @@ function formatCount(n: number): string {
         {{ iconEmoji }}
       </div>
       <div class="min-w-0 flex-1">
-        <h1 class="font-serif text-3xl tracking-tight text-(--color-ink)">{{ name }}</h1>
-        <p v-if="description" class="mt-2 text-(--color-ink-muted)">{{ description }}</p>
-        <div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-(--color-ink-muted)">
-          <div class="flex items-center gap-1">
+        <h1 class="font-serif text-4xl tracking-tight text-(--color-ink)">{{ name }}</h1>
+        <p
+          v-if="description"
+          class="mt-3 text-[17px] leading-[1.55] text-(--color-ink-muted)"
+        >
+          {{ description }}
+        </p>
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-sm text-(--color-ink-muted)">
+          <span class="inline-flex items-center gap-1">
             <Star :size="14" class="fill-amber-500 text-amber-500" aria-hidden="true" />
-            <span class="font-semibold">{{ Number(starsAvg).toFixed(1) }}</span>
-          </div>
-          <div class="flex items-center gap-1">
+            <span class="font-semibold text-(--color-ink)">{{ Number(starsAvg).toFixed(1) }}</span>
+          </span>
+          <span aria-hidden="true" class="text-(--color-ink-muted)/50">·</span>
+          <span class="inline-flex items-center gap-1">
             <Download :size="14" aria-hidden="true" />
             <span class="font-mono">{{ formatCount(downloadsCount) }}</span>
-          </div>
-          <span v-if="deptTrail">· {{ deptTrail }}</span>
+          </span>
+          <template v-if="deptTrail">
+            <span aria-hidden="true" class="text-(--color-ink-muted)/50">·</span>
+            <span>{{ deptTrail }}</span>
+          </template>
         </div>
       </div>
     </div>
 
-    <div class="mt-4 flex flex-wrap items-center gap-2">
-      <InstallButton :extension-id="id" />
+    <div class="mt-5 flex flex-wrap items-center gap-2">
+      <InstallButton :extension-id="id" size="lg" />
       <SaveButton :extension-id="id" />
       <ShareButton :url="shareUrl" />
     </div>
