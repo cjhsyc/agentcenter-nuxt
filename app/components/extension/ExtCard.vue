@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Building2, Download, Star } from "lucide-vue-next"
 import { deptPath, MY_DEPT_ID } from "~~/shared/data/departments"
-import { tagLabel } from "~~/shared/tags"
 import type { ExtensionListItem } from "~~/shared/db/queries-types"
 import type { Locale } from "~~/shared/types"
 
@@ -9,8 +8,6 @@ const props = defineProps<{ ext: ExtensionListItem }>()
 
 const { locale } = useI18n()
 const localePath = useLocalePath()
-
-const TAG_VISIBLE_LIMIT = 3
 
 const BADGE_LABEL = { official: "Official", popular: "Popular", new: "New" } as const
 const BADGE_CLASS = {
@@ -42,11 +39,6 @@ const isMine = computed(() => {
   return id === MY_DEPT_ID || id.startsWith(`${MY_DEPT_ID}.`)
 })
 
-const visibleTags = computed(() => props.ext.tagIds.slice(0, TAG_VISIBLE_LIMIT))
-const hiddenTagCount = computed(() =>
-  Math.max(0, props.ext.tagIds.length - TAG_VISIBLE_LIMIT),
-)
-
 function formatCount(n: number): string {
   if (n < 1000) return String(n)
   return `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k`
@@ -55,7 +47,7 @@ function formatCount(n: number): string {
 
 <template>
   <article
-    class="group relative flex flex-col gap-3 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-[18px] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-(--color-accent)/30 hover:shadow-[0_2px_10px_-4px_oklch(0_0_0_/_0.08)]"
+    class="group relative flex flex-col gap-2 rounded-(--radius-card) border border-(--color-border) bg-(--color-card) p-4 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-(--color-accent)/30 hover:shadow-[0_2px_10px_-4px_oklch(0_0_0_/_0.08)]"
   >
     <div class="flex items-center gap-3">
       <div
@@ -92,45 +84,25 @@ function formatCount(n: number): string {
       {{ desc }}
     </p>
 
-    <div
-      v-if="deptLeaf"
-      class="inline-flex items-center gap-1.5 text-[11px]"
-      :class="isMine ? 'text-(--color-accent)' : 'text-(--color-ink-muted)'"
-    >
-      <Building2 :size="11" aria-hidden="true" />
-      <span class="truncate font-semibold">{{ deptLeaf }}</span>
-    </div>
-
-    <div v-if="visibleTags.length > 0" class="flex flex-wrap items-center gap-1">
+    <div class="mt-auto flex items-center gap-2 pt-1 text-(--color-ink-muted) font-mono text-[12px]">
       <span
-        v-for="tag in visibleTags"
-        :key="tag"
-        class="rounded border border-(--color-border) px-1.5 py-0.5 font-mono text-[11px] font-semibold text-(--color-ink-muted)"
+        v-if="deptLeaf"
+        class="inline-flex min-w-0 items-center gap-1"
+        :class="isMine ? 'text-(--color-accent)' : ''"
       >
-        #{{ tagLabel(tag, locale as Locale) }}
+        <Building2 :size="12" aria-hidden="true" />
+        <span class="truncate font-semibold">{{ deptLeaf }}</span>
       </span>
-      <span
-        v-if="hiddenTagCount > 0"
-        class="rounded border border-(--color-border)/60 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-(--color-ink-muted)/70"
-      >
-        +{{ hiddenTagCount }}
-      </span>
-    </div>
-
-    <div class="mt-auto flex items-center gap-3 pt-1">
-      <div class="flex items-center gap-1">
+      <span v-if="deptLeaf" aria-hidden="true" class="text-(--color-ink-muted)/50">·</span>
+      <span class="inline-flex items-center gap-1">
         <Star :size="12" class="fill-amber-500 text-amber-500" aria-hidden="true" />
-        <span class="font-mono text-[12px] font-semibold">{{ Number(ext.starsAvg).toFixed(1) }}</span>
-      </div>
-      <div class="flex items-center gap-1">
-        <Download :size="12" class="text-(--color-ink-muted)" aria-hidden="true" />
-        <span class="text-(--color-ink-muted) font-mono text-[12px]">
-          {{ formatCount(ext.downloadsCount) }}
-        </span>
-      </div>
-      <div class="relative z-10 ml-auto">
-        <InstallButton :extension-id="ext.id" size="sm" />
-      </div>
+        <span class="font-semibold text-(--color-ink)">{{ Number(ext.starsAvg).toFixed(1) }}</span>
+      </span>
+      <span aria-hidden="true" class="text-(--color-ink-muted)/50">·</span>
+      <span class="inline-flex items-center gap-1">
+        <Download :size="12" aria-hidden="true" />
+        <span>{{ formatCount(ext.downloadsCount) }}</span>
+      </span>
     </div>
   </article>
 </template>
