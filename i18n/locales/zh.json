@@ -40,8 +40,8 @@
     "discoverySearchPlaceholder": "按名称、描述或任务搜索技能…",
     "discoveryExploreAll": "探索全部技能",
     "tabs": {
+      "official": "推荐",
       "popular": "热门",
-      "topRated": "高分",
       "recent": "新上"
     },
     "tagRailLabel": "按主题浏览",

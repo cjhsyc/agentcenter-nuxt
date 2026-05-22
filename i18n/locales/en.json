@@ -40,8 +40,8 @@
     "discoverySearchPlaceholder": "Search skills by name, description, or task…",
     "discoveryExploreAll": "Explore all skills",
     "tabs": {
+      "official": "Recommended",
       "popular": "Popular",
-      "topRated": "Top rated",
       "recent": "New"
     },
     "tagRailLabel": "Browse by topic",
