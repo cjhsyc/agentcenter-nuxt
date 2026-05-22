@@ -7,16 +7,23 @@ import type { TagFacet } from "~~/shared/types"
 const { t } = useI18n()
 const localePath = useLocalePath()
 
-const activeTab = ref<HomeTabKey>("popular")
-const sortFor: Record<HomeTabKey, "downloads" | "stars" | "recent"> = {
-  popular: "downloads",
-  topRated: "stars",
-  recent: "recent",
+const activeTab = ref<HomeTabKey>("official")
+
+type HomeQuery = {
+  category: "skills"
+  sort: "downloads" | "recent"
+  filter?: "official"
+}
+
+const queryFor: Record<HomeTabKey, HomeQuery> = {
+  official: { category: "skills", filter: "official", sort: "downloads" },
+  popular: { category: "skills", sort: "downloads" },
+  recent: { category: "skills", sort: "recent" },
 }
 
 const { data: gridData } = await useFetch("/api/internal/extensions", {
   key: "home-discovery-extensions",
-  query: computed(() => ({ category: "skills", sort: sortFor[activeTab.value] })),
+  query: computed(() => queryFor[activeTab.value]),
   default: () => ({
     items: [] as ExtensionListItem[],
     total: 0,
