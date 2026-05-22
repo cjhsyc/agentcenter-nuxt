@@ -49,13 +49,6 @@ export interface Extension {
   descZh: string
 }
 
-export interface Collection {
-  id: string
-  name: string
-  nameZh: string
-  count: number
-}
-
 export interface CreatorFacet {
   id: string
   name: string | null
