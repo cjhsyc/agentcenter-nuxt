@@ -130,3 +130,16 @@ export type ProfileActivityEvent =
   | { kind: "installed"; at: string; extensionId: string; slug: string; name: string; version: string }
   | { kind: "published"; at: string; extensionId: string; slug: string; name: string; version: string }
   | { kind: "rated"; at: string; extensionId: string; slug: string; name: string; stars: number }
+
+export interface ProfileCollectionRow {
+  id: string
+  slug: string
+  name: string
+  nameZh: string | null
+  description: string | null
+  descriptionZh: string | null
+  systemKind: "installed" | "saved" | null
+  visibility: "private" | "public"
+  itemCount: number
+  updatedAt: string
+}
