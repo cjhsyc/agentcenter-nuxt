@@ -4,7 +4,8 @@ import { itemCountExpression } from "~~/server/repositories/collections"
 import { useDb } from "~~/server/utils/db"
 import { users } from "~~/shared/db/schema/auth"
 import { collectionItems, collections } from "~~/shared/db/schema/collection"
-import { extensions } from "~~/shared/db/schema/extension"
+import { extensions, extensionTags } from "~~/shared/db/schema/extension"
+import type { ExtensionListItem } from "~~/shared/db/queries-types"
 import type { CollectionVisibility } from "~~/shared/validators/collection"
 
 // View-layer aggregations for collections. CRUD lives in
@@ -35,16 +36,10 @@ export interface PublicCollectionRow {
   ownerName: string | null
 }
 
-export interface CollectionItemRow {
-  extensionId: string
-  slug: string
-  name: string
-  nameZh: string | null
-  category: string
-  iconColor: string | null
-  iconEmoji: string | null
-  description: string | null
-  descriptionZh: string | null
+// Items in a collection are rendered with the same ExtCard the browse grid
+// uses, so the row shape extends the marketplace's ExtensionListItem with
+// the collection-specific addedAt timestamp.
+export interface CollectionItemRow extends ExtensionListItem {
   addedAt: Date
 }
 
@@ -122,23 +117,39 @@ export async function listPublicPaged(params: {
 export async function listItems(
   collectionId: string,
 ): Promise<CollectionItemRow[]> {
+  // Mirrors the listSelect shape in server/repositories/extensions.ts so the
+  // detail page can pass each row straight into <ExtCard :ext="…">. tagIds
+  // come from a leftJoin + array_agg + GROUP BY, exactly like the browse grid.
   const db = useDb()
   return db
     .select({
-      extensionId: extensions.id,
+      id: extensions.id,
       slug: extensions.slug,
+      category: extensions.category,
+      badge: extensions.badge,
+      scope: extensions.scope,
+      funcCat: extensions.funcCat,
+      subCat: extensions.subCat,
+      l2: extensions.l2,
+      deptId: extensions.deptId,
+      iconEmoji: extensions.iconEmoji,
+      iconColor: extensions.iconColor,
       name: extensions.name,
       nameZh: extensions.nameZh,
-      category: extensions.category,
-      iconColor: extensions.iconColor,
-      iconEmoji: extensions.iconEmoji,
+      tagline: extensions.tagline,
+      taglineZh: extensions.taglineZh,
       description: extensions.description,
       descriptionZh: extensions.descriptionZh,
+      downloadsCount: extensions.downloadsCount,
+      starsAvg: extensions.starsAvg,
+      tagIds: sql<string[]>`coalesce(array_agg(${extensionTags.tagId}) FILTER (WHERE ${extensionTags.tagId} IS NOT NULL), '{}')`,
       addedAt: collectionItems.addedAt,
     })
     .from(collectionItems)
     .innerJoin(extensions, eq(extensions.id, collectionItems.extensionId))
+    .leftJoin(extensionTags, eq(extensionTags.extensionId, extensions.id))
     .where(eq(collectionItems.collectionId, collectionId))
+    .groupBy(extensions.id, collectionItems.addedAt)
     .orderBy(desc(collectionItems.addedAt))
 }
 

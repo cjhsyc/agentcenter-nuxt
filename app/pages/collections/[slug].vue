@@ -1,21 +1,14 @@
 <script setup lang="ts">
-import { Bookmark, Check, Copy, FolderOpen, Globe, Lock, Pencil, Trash2 } from "lucide-vue-next"
+import { Bookmark, Check, Copy, FolderOpen, Globe, Lock, Pencil, Trash2, X } from "lucide-vue-next"
 
 import CollectionForm from "~/components/collection/CollectionForm.vue"
+import ExtCard from "~/components/extension/ExtCard.vue"
 import Dialog from "~/components/ui/Dialog.vue"
 import DialogContent from "~/components/ui/DialogContent.vue"
 import DialogTitle from "~/components/ui/DialogTitle.vue"
+import type { ExtensionListItem } from "~~/shared/db/queries-types"
 
-interface CollectionItemDTO {
-  extensionId: string
-  slug: string
-  name: string
-  nameZh: string | null
-  category: string
-  iconColor: string | null
-  iconEmoji: string | null
-  description: string | null
-  descriptionZh: string | null
+interface CollectionItemDTO extends ExtensionListItem {
   addedAt: string
 }
 
@@ -273,43 +266,29 @@ async function onDelete() {
           <p class="text-sm text-(--color-ink-muted)">{{ t("collections.detail.empty") }}</p>
         </div>
 
-        <ul v-else class="grid gap-2">
-          <li
+        <div
+          v-else
+          class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4"
+        >
+          <div
             v-for="item in data.items"
-            :key="item.extensionId"
-            class="flex items-center gap-4 rounded-lg border border-(--color-border) bg-(--color-card) p-4"
+            :key="item.id"
+            class="relative"
           >
-            <NuxtLink
-              :to="localePath(`/extensions/${item.slug}`)"
-              class="flex-1 min-w-0"
-            >
-              <div class="flex items-center gap-2">
-                <span class="font-semibold text-(--color-ink) truncate">
-                  {{ locale === "zh" && item.nameZh ? item.nameZh : item.name }}
-                </span>
-                <span
-                  class="font-mono text-[10px] uppercase tracking-wide text-(--color-ink-muted)"
-                >{{ item.category }}</span>
-              </div>
-              <div
-                v-if="item.description"
-                class="mt-0.5 line-clamp-1 text-xs text-(--color-ink-muted)"
-              >
-                {{ locale === "zh" && item.descriptionZh ? item.descriptionZh : item.description }}
-              </div>
-            </NuxtLink>
+            <ExtCard :ext="item" />
             <button
               v-if="canEdit"
               type="button"
               :disabled="busy"
               :aria-label="t('collections.actions.remove')"
-              class="rounded p-1 text-(--color-ink-muted) hover:bg-(--color-sidebar) hover:text-(--color-ink) disabled:opacity-50"
-              @click="onRemoveItem(item.extensionId)"
+              :title="t('collections.actions.remove')"
+              class="absolute right-2 top-2 z-10 inline-flex size-6 items-center justify-center rounded-md border border-(--color-border) bg-(--color-card)/90 text-(--color-ink-muted) shadow-sm transition-colors hover:bg-red-50 hover:border-red-300/60 hover:text-red-600 disabled:opacity-50"
+              @click.stop.prevent="onRemoveItem(item.id)"
             >
-              <Trash2 :size="14" />
+              <X :size="12" />
             </button>
-          </li>
-        </ul>
+          </div>
+        </div>
       </section>
     </template>
 
