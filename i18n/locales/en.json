@@ -40,7 +40,7 @@
     "discoverySearchPlaceholder": "Search skills by name, description, or task…",
     "discoveryExploreAll": "Explore all skills",
     "tabs": {
-      "official": "Official picks",
+      "official": "Recommended",
       "popular": "Popular",
       "recent": "New"
     },

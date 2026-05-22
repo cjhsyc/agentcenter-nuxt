@@ -14,12 +14,12 @@ const TABS: HomeTabKey[] = ["official", "popular", "recent"]
     :model-value="modelValue"
     @update:model-value="(v) => emit('update:modelValue', v as HomeTabKey)"
   >
-    <TabsList class="flex w-full justify-center gap-10">
+    <TabsList class="flex w-full justify-center gap-12 border-b-0">
       <TabsTrigger
         v-for="key in TABS"
         :key="key"
         :value="key"
-        class="px-5 py-3 text-base font-semibold tracking-tight data-[state=active]:font-bold"
+        class="px-6 py-4 text-lg font-semibold tracking-tight data-[state=active]:font-bold data-[state=active]:border-b-[3px]"
       >
         {{ t(`home.tabs.${key}`) }}
       </TabsTrigger>
