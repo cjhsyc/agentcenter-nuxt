@@ -28,12 +28,25 @@
     "comingSoon": "Coming soon"
   },
   "home": {
-    "featuredLabel": "Featured this week",
-    "featuredDescription": "Marketplace for AI agent extensions — Skills, MCP servers, slash commands, and plugins.",
-    "trendingTitle": "Trending",
-    "browseAll": "Browse all {count}",
-    "viewExtension": "View extension",
-    "installsCount": "{count} installs"
+    "heroEyebrow": "AGENTCENTER · CURATED AI SKILLS",
+    "heroTitleBefore": "Install ",
+    "heroTitleBrand": "AgentCenter",
+    "heroTitleAfter": ", unlock Claude's superpowers.",
+    "heroSubtitle": "Curated picks, fast installs, easy discovery — ready to drop into your team.",
+    "heroCtaBrowse": "Browse skills",
+    "heroCtaCli": "Install the CLI",
+    "discoveryHeading": "{count} skills, curated for your team.",
+    "discoveryHeadingEmpty": "AI skills, curated for your team.",
+    "discoverySearchPlaceholder": "Search skills by name, description, or task…",
+    "discoveryExploreAll": "Explore all skills",
+    "tabs": {
+      "popular": "Popular",
+      "topRated": "Top rated",
+      "recent": "New"
+    },
+    "tagRailLabel": "Browse by topic",
+    "tagRailAll": "All skills",
+    "viewMore": "View more"
   },
   "errors": {
     "generic": {
@@ -83,14 +96,6 @@
       "showingZero": "No matches",
       "clearAll": "Clear all",
       "removeFilter": "Remove {label} filter"
-    },
-    "mcpPanoramaFeature": {
-      "eyebrow": "MCP PANORAMA",
-      "title": "The MCP adoption landscape",
-      "description": "Two layers, every sector and platform domain — see which tools are live, in build, or yet to start.",
-      "stats": "{domains} domains · {tools} tools · 2 layers",
-      "statsFallback": "Browse every tool, sector, and domain",
-      "cta": "Open the panorama"
     },
     "mcpPanoramaLink": "View the MCP Panorama",
     "backToBrowse": "Browse extensions",
