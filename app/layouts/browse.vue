@@ -1,9 +1,5 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const sidebarCollapsed = useState("browse-sidebar-collapsed", () => false)
-function toggleSidebar() {
-  sidebarCollapsed.value = !sidebarCollapsed.value
-}
 </script>
 
 <template>
@@ -19,16 +15,15 @@ function toggleSidebar() {
       class="sticky top-0 z-10 h-16 border-b border-(--color-border) bg-(--color-card)"
       role="banner"
     >
-      <TopBar :collapsed="sidebarCollapsed" @toggle-sidebar="toggleSidebar" />
+      <TopBar />
     </header>
 
     <div class="mx-auto w-full max-w-7xl flex flex-1">
       <aside
-        class="sticky top-16 self-start h-[calc(100vh-4rem)] overflow-hidden flex flex-col transition-[width] duration-200"
-        :class="sidebarCollapsed ? 'w-0' : 'w-[240px]'"
+        class="hidden md:flex sticky top-16 self-start h-[calc(100vh-4rem)] w-[240px] overflow-hidden flex-col"
         role="navigation"
       >
-        <Sidebar :collapsed="sidebarCollapsed" />
+        <Sidebar />
       </aside>
 
       <main id="main-content" tabindex="-1" class="flex-1 min-w-0 focus:outline-none">

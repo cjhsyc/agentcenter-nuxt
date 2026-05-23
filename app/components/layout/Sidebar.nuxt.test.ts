@@ -11,7 +11,6 @@ const NuxtLinkStub = defineComponent({
 })
 
 const mountOpts = {
-  props: { collapsed: false },
   global: { stubs: { NuxtLink: NuxtLinkStub } },
 }
 
@@ -63,11 +62,4 @@ describe("Sidebar", () => {
     expect(html).not.toContain("network protocols")
   })
 
-  it("collapsed prop hides the inner content", async () => {
-    const wrapper = await mountSuspended(Sidebar, {
-      ...mountOpts,
-      props: { collapsed: true },
-    })
-    expect(wrapper.findAll("a").length).toBe(0)
-  })
 })

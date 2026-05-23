@@ -1,11 +1,4 @@
 <script setup lang="ts">
-import { Menu } from "lucide-vue-next"
-
-withDefaults(defineProps<{ collapsed: boolean; noSidebar?: boolean }>(), {
-  noSidebar: false,
-})
-const emit = defineEmits<{ "toggle-sidebar": [] }>()
-
 const { t } = useI18n()
 const route = useRoute()
 const localePath = useLocalePath()
@@ -29,17 +22,6 @@ function isCategoryActive(key: CategoryKey): boolean {
 
 <template>
   <div class="mx-auto w-full max-w-7xl h-full flex items-center gap-4 px-5">
-    <button
-      v-if="!noSidebar"
-      type="button"
-      class="p-2 rounded hover:bg-(--color-sidebar) focus:outline-none focus-visible:ring-2 focus-visible:ring-(--color-accent)"
-      :aria-label="t('nav.toggleSidebar')"
-      :aria-expanded="!collapsed"
-      @click="emit('toggle-sidebar')"
-    >
-      <Menu :size="20" aria-hidden="true" />
-    </button>
-
     <NuxtLink
       :to="localePath('/')"
       class="font-serif text-lg tracking-tight hover:opacity-80"

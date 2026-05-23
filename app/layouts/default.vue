@@ -15,7 +15,7 @@ const { t } = useI18n()
       class="sticky top-0 z-10 h-16 border-b border-(--color-border) bg-(--color-card)"
       role="banner"
     >
-      <TopBar :collapsed="true" no-sidebar />
+      <TopBar />
     </header>
 
     <main id="main-content" tabindex="-1" class="flex-1 focus:outline-none">
