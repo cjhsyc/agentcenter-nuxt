@@ -1,37 +1,12 @@
 <script setup lang="ts">
-import {
-  ChevronDown,
-  ChevronRight,
-  Command,
-  Globe2,
-  Plug,
-  Zap,
-} from "lucide-vue-next"
+import { ChevronDown, ChevronRight } from "lucide-vue-next"
 import { FUNC_CAT_COLORS, FUNC_TAXONOMY } from "~~/shared/taxonomy"
-import type { Component } from "vue"
 
 defineProps<{ collapsed: boolean }>()
 
 const { t } = useI18n()
 const route = useRoute()
 const localePath = useLocalePath()
-
-type Category = "skills" | "mcp" | "slash" | "plugins"
-
-const BROWSE_ITEMS: { key: Category; labelKey: string; Icon: Component }[] = [
-  { key: "skills", labelKey: "sidebar.skills", Icon: Zap },
-  { key: "mcp", labelKey: "sidebar.mcpServers", Icon: Globe2 },
-  { key: "slash", labelKey: "sidebar.slashCommands", Icon: Command },
-  { key: "plugins", labelKey: "sidebar.plugins", Icon: Plug },
-]
-
-const activeCategory = computed<Category | null>(() => {
-  const raw = route.query.category
-  if (typeof raw === "string" && ["skills", "mcp", "slash", "plugins"].includes(raw)) {
-    return raw as Category
-  }
-  return null
-})
 
 const activeFuncCat = computed(() => (typeof route.query.funcCat === "string" ? route.query.funcCat : null))
 const activeSubCat = computed(() => (typeof route.query.subCat === "string" ? route.query.subCat : null))
@@ -57,26 +32,6 @@ function buildHref(updates: Record<string, string | null>): string {
     v-if="!collapsed"
     class="min-w-[200px] flex-1 overflow-y-auto px-5 py-3 text-(--color-ink) [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
   >
-    <!-- Browse -->
-    <h2 class="px-2 pb-1.5 font-serif text-[12px] italic tracking-wide text-(--color-ink-muted)">
-      {{ t("sidebar.browse") }}
-    </h2>
-    <div class="flex flex-col gap-px">
-      <NuxtLink
-        v-for="item in BROWSE_ITEMS"
-        :key="item.key"
-        :to="buildHref({ category: item.key === activeCategory ? null : item.key })"
-        class="flex w-full items-center gap-2.5 rounded-md border-l-2 px-2 py-1.5 text-[15px] font-medium text-(--color-ink) transition hover:bg-(--color-card)"
-        :class="activeCategory === item.key ? 'border-l-(--color-ink) bg-(--color-sidebar)/60 font-semibold' : 'border-transparent'"
-      >
-        <component :is="item.Icon" :size="16" class="shrink-0" />
-        <span class="flex-1 truncate">{{ t(item.labelKey) }}</span>
-      </NuxtLink>
-    </div>
-
-    <div class="bg-(--color-border) mx-1 my-3 h-px" />
-
-    <!-- Function types -->
     <h2 class="px-2 pb-1.5 font-serif text-[12px] italic tracking-wide text-(--color-ink-muted)">
       {{ t("sidebar.categories") }}
     </h2>
