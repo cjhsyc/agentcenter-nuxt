@@ -36,7 +36,7 @@ function buildHref(updates: Record<string, string | null>): string {
       <NuxtLink
         :to="buildHref({ funcCat: null, subCat: null, l2: null })"
         class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[15px] font-semibold transition hover:bg-(--color-card)"
-        :class="!activeFuncCat && !activeSubCat && !activeL2 ? 'bg-(--color-sidebar)/60 text-(--color-ink)' : 'text-(--color-ink)'"
+        :class="!activeFuncCat && !activeSubCat && !activeL2 ? 'text-(--color-ink)' : 'text-(--color-ink-muted)'"
       >
         <span class="bg-(--color-ink-muted) size-[9px] shrink-0 rounded-sm" />
         <span class="flex-1">{{ t("sidebar.allCategories") }}</span>
@@ -46,7 +46,7 @@ function buildHref(updates: Record<string, string | null>): string {
         <NuxtLink
           :to="buildHref({ funcCat: activeFuncCat === cat.key && !activeSubCat && !activeL2 ? null : cat.key, subCat: null, l2: null })"
           class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[15px] font-semibold transition hover:bg-(--color-card)"
-          :class="activeFuncCat === cat.key && !activeSubCat && !activeL2 ? 'bg-(--color-sidebar)/60 text-(--color-ink)' : 'text-(--color-ink)'"
+          :class="activeFuncCat === cat.key && !activeSubCat && !activeL2 ? 'text-(--color-ink)' : 'text-(--color-ink-muted)'"
           :aria-expanded="activeFuncCat === cat.key"
         >
           <span class="size-[9px] shrink-0 rounded-sm" :style="{ background: FUNC_CAT_COLORS[cat.key] }" />
@@ -60,7 +60,7 @@ function buildHref(updates: Record<string, string | null>): string {
             <NuxtLink
               :to="buildHref({ funcCat: cat.key, subCat: activeSubCat === l1.key ? null : l1.key, l2: null })"
               class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13.5px] font-medium hover:bg-(--color-card)"
-              :class="activeSubCat === l1.key && !activeL2 ? 'bg-(--color-sidebar)/60 text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
+              :class="activeSubCat === l1.key && !activeL2 ? 'text-(--color-ink) font-semibold' : 'text-(--color-ink)'"
               :aria-expanded="l1.l2.length > 0 ? activeSubCat === l1.key : undefined"
             >
               <span
@@ -80,7 +80,7 @@ function buildHref(updates: Record<string, string | null>): string {
                 :key="l2key"
                 :to="buildHref({ funcCat: cat.key, subCat: l1.key, l2: activeL2 === l2key ? null : l2key })"
                 class="flex w-full items-center gap-1.5 rounded-md py-1 pr-2 pl-6 text-left text-[13px] hover:bg-(--color-card)"
-                :class="activeL2 === l2key ? 'bg-(--color-sidebar)/60 text-(--color-ink) font-semibold' : 'text-(--color-ink)/85'"
+                :class="activeL2 === l2key ? 'text-(--color-ink) font-semibold' : 'text-(--color-ink)/85'"
               >
                 <span class="bg-(--color-ink-muted) size-[3px] shrink-0 rounded-full" />
                 {{ t(`taxonomy.l2.${l2key}`) }}
