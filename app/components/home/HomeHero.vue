@@ -17,7 +17,7 @@ const INSTALL_COMMAND = "npm i -g @agentcenter/cli"
       </p>
 
       <h1
-        class="mt-6 font-serif text-4xl leading-tight tracking-tight text-(--color-ink) sm:text-5xl md:text-[56px]"
+        class="mt-6 font-serif text-3xl leading-tight tracking-tight text-(--color-ink) sm:text-4xl md:text-5xl"
       >
         <span>{{ t("home.heroTitleBefore") }}</span><span class="text-(--color-accent)">{{ t("home.heroTitleBrand") }}</span><span>{{ t("home.heroTitleAfter") }}</span>
       </h1>

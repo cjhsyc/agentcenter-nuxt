@@ -37,8 +37,8 @@
     "heroSubtitle": "精选推荐、高速安装、轻松发现 — 收录的技能可直接接入你的团队。",
     "heroCtaBrowse": "浏览技能",
     "heroCtaCli": "安装 CLI",
-    "discoveryHeading": "收录 {count} 个技能，为你的团队精选。",
-    "discoveryHeadingEmpty": "为你的团队精选 AI 技能。",
+    "discoveryHeading": "收录 {count} 个扩展，为你的团队精选。",
+    "discoveryHeadingEmpty": "为你的团队精选 AI 扩展。",
     "discoverySearchPlaceholder": "按名称、描述或任务搜索技能…",
     "discoveryExploreAll": "探索全部技能",
     "tabs": {
