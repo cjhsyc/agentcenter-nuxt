@@ -37,8 +37,8 @@
     "heroSubtitle": "Curated picks, fast installs, easy discovery — ready to drop into your team.",
     "heroCtaBrowse": "Browse skills",
     "heroCtaCli": "Install the CLI",
-    "discoveryHeading": "{count} skills, curated for your team.",
-    "discoveryHeadingEmpty": "AI skills, curated for your team.",
+    "discoveryHeading": "{count} extensions, curated for your team.",
+    "discoveryHeadingEmpty": "AI extensions, curated for your team.",
     "discoverySearchPlaceholder": "Search skills by name, description, or task…",
     "discoveryExploreAll": "Explore all skills",
     "tabs": {

@@ -31,6 +31,18 @@ const { data: gridData } = await useFetch("/api/internal/extensions", {
   }),
 })
 
+// Site-wide total of all published extensions across every category. Fetched
+// once, independently of the active tab, so the heading number stays stable
+// when the user flips between Recommended / Popular / Recent.
+const { data: totalData } = await useFetch("/api/internal/extensions", {
+  key: "home-discovery-total",
+  default: () => ({
+    items: [] as ExtensionListItem[],
+    total: 0,
+    filters: {},
+  }),
+})
+
 const { data: facetsData } = await useFetch("/api/internal/facets", {
   key: "home-discovery-facets",
   default: () => ({
@@ -41,7 +53,7 @@ const { data: facetsData } = await useFetch("/api/internal/facets", {
 })
 
 const items = computed(() => gridData.value.items.slice(0, 12))
-const total = computed(() => gridData.value.total)
+const total = computed(() => totalData.value.total)
 const tags = computed(() => facetsData.value.tags)
 
 const searchInput = ref("")
