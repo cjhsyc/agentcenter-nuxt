@@ -65,6 +65,14 @@ const moreOpen = ref(false)
         {{ t(item.labelKey) }}
       </NuxtLink>
 
+      <NuxtLink
+        :to="localePath('/collections')"
+        class="relative px-3 py-1.5 text-(--color-ink-muted) transition-colors hover:text-(--color-ink) after:absolute after:inset-x-3 after:-bottom-px after:h-px after:bg-transparent"
+        active-class="text-(--color-ink) font-semibold after:bg-(--color-ink)"
+      >
+        {{ t("nav.collections") }}
+      </NuxtLink>
+
       <Popover v-model:open="moreOpen">
         <PopoverTrigger as-child>
           <button
@@ -98,14 +106,6 @@ const moreOpen = ref(false)
           </NuxtLink>
         </PopoverContent>
       </Popover>
-
-      <NuxtLink
-        :to="localePath('/collections')"
-        class="relative px-3 py-1.5 text-(--color-ink-muted) transition-colors hover:text-(--color-ink) after:absolute after:inset-x-3 after:-bottom-px after:h-px after:bg-transparent"
-        active-class="text-(--color-ink) font-semibold after:bg-(--color-ink)"
-      >
-        {{ t("nav.collections") }}
-      </NuxtLink>
     </nav>
 
     <NuxtLink
