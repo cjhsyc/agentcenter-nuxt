@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight } from "lucide-vue-next"
-
 const { t } = useI18n()
-const localePath = useLocalePath()
 
 const INSTALL_COMMAND = "npm i -g @agentcenter/cli"
 </script>
@@ -25,16 +22,6 @@ const INSTALL_COMMAND = "npm i -g @agentcenter/cli"
       <p class="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-(--color-ink-muted) sm:text-base">
         {{ t("home.heroSubtitle") }}
       </p>
-
-      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <NuxtLink
-          :to="localePath({ path: '/extensions', query: { category: 'skills' } })"
-          class="inline-flex items-center gap-2 rounded-full bg-(--color-ink) px-5 py-2.5 text-sm font-semibold text-(--color-card) transition hover:opacity-90"
-        >
-          {{ t("home.heroCtaBrowse") }}
-          <ArrowRight :size="14" aria-hidden="true" />
-        </NuxtLink>
-      </div>
 
       <div class="mx-auto mt-8 max-w-xl">
         <InstallCommand :command="INSTALL_COMMAND" />
