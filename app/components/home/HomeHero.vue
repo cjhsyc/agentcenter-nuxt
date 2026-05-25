@@ -5,7 +5,7 @@ const INSTALL_COMMAND = "npm i -g @agentcenter/cli"
 </script>
 
 <template>
-  <section class="home-hero relative overflow-hidden border-b border-(--color-border)">
+  <section class="home-hero relative overflow-hidden">
     <div class="relative mx-auto max-w-4xl px-6 pt-16 pb-12 text-center sm:pt-20 sm:pb-16">
       <p
         class="mx-auto inline-flex items-center gap-2 rounded-full border border-(--color-border) bg-(--color-card)/80 px-3 py-1 font-mono text-[11px] tracking-widest text-(--color-ink-muted) uppercase backdrop-blur-sm"
