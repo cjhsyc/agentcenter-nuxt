@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight, Terminal } from "lucide-vue-next"
+import { ArrowRight } from "lucide-vue-next"
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -8,7 +8,7 @@ const INSTALL_COMMAND = "npm i -g @agentcenter/cli"
 </script>
 
 <template>
-  <section class="home-hero relative overflow-hidden">
+  <section class="home-hero relative overflow-hidden border-b border-(--color-border)">
     <div class="relative mx-auto max-w-4xl px-6 pt-16 pb-12 text-center sm:pt-20 sm:pb-16">
       <p
         class="mx-auto inline-flex items-center gap-2 rounded-full border border-(--color-border) bg-(--color-card)/80 px-3 py-1 font-mono text-[11px] tracking-widest text-(--color-ink-muted) uppercase backdrop-blur-sm"
@@ -34,16 +34,9 @@ const INSTALL_COMMAND = "npm i -g @agentcenter/cli"
           {{ t("home.heroCtaBrowse") }}
           <ArrowRight :size="14" aria-hidden="true" />
         </NuxtLink>
-        <a
-          href="#install-cli"
-          class="inline-flex items-center gap-2 rounded-full border border-(--color-ink)/25 px-5 py-2.5 text-sm font-semibold text-(--color-ink) transition hover:bg-(--color-ink)/5"
-        >
-          <Terminal :size="14" aria-hidden="true" />
-          {{ t("home.heroCtaCli") }}
-        </a>
       </div>
 
-      <div id="install-cli" class="mx-auto mt-8 max-w-xl">
+      <div class="mx-auto mt-8 max-w-xl">
         <InstallCommand :command="INSTALL_COMMAND" />
       </div>
     </div>
@@ -61,6 +54,6 @@ const INSTALL_COMMAND = "npm i -g @agentcenter/cli"
 
 :global(.dark) .home-hero,
 :global(.mono) .home-hero {
-  background: var(--color-bg);
+  background: var(--color-card);
 }
 </style>
