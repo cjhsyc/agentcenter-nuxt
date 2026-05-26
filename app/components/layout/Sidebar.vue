@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronDown, ChevronRight } from "lucide-vue-next"
+import { ArrowUpRight, ChevronDown, ChevronRight } from "lucide-vue-next"
 import { FUNC_CAT_COLORS, FUNC_TAXONOMY } from "~~/shared/taxonomy"
 
 const { t } = useI18n()
@@ -9,6 +9,7 @@ const localePath = useLocalePath()
 const activeFuncCat = computed(() => (typeof route.query.funcCat === "string" ? route.query.funcCat : null))
 const activeSubCat = computed(() => (typeof route.query.subCat === "string" ? route.query.subCat : null))
 const activeL2 = computed(() => (typeof route.query.l2 === "string" ? route.query.l2 : null))
+const isMcpCategory = computed(() => route.query.category === "mcp")
 
 function buildHref(updates: Record<string, string | null>): string {
   const params = new URLSearchParams()
@@ -29,6 +30,29 @@ function buildHref(updates: Record<string, string | null>): string {
   <div
     class="min-w-[200px] flex-1 overflow-y-auto px-5 py-3 text-(--color-ink) [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
   >
+    <section v-if="isMcpCategory" class="mb-3 border-b border-(--color-border) pb-3">
+      <h2 class="px-2 pb-1.5 font-serif text-[12px] italic tracking-wide text-(--color-ink-muted)">
+        {{ t("sidebar.mcp.heading") }}
+      </h2>
+      <div class="flex flex-col gap-px">
+        <span
+          aria-current="page"
+          class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[15px] font-semibold text-(--color-ink)"
+        >
+          <span class="bg-(--color-ink) size-[9px] shrink-0 rounded-sm" />
+          <span class="flex-1">{{ t("sidebar.mcp.byTypes") }}</span>
+        </span>
+        <NuxtLink
+          :to="localePath('/mcp-panorama')"
+          class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[15px] font-semibold text-(--color-accent) transition hover:bg-(--color-card)"
+        >
+          <span class="bg-(--color-accent) size-[9px] shrink-0 rounded-sm" />
+          <span class="flex-1">{{ t("sidebar.mcp.byPanorama") }}</span>
+          <ArrowUpRight :size="14" class="shrink-0" aria-hidden="true" />
+        </NuxtLink>
+      </div>
+    </section>
+
     <h2 class="px-2 pb-1.5 font-serif text-[12px] italic tracking-wide text-(--color-ink-muted)">
       {{ t("sidebar.categories") }}
     </h2>

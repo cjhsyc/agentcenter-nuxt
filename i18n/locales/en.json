@@ -138,7 +138,12 @@
     "skills": "Skills",
     "mcpServers": "MCP Servers",
     "slashCommands": "Slash Commands",
-    "plugins": "Plugins"
+    "plugins": "Plugins",
+    "mcp": {
+      "heading": "Browse MCP",
+      "byTypes": "By types",
+      "byPanorama": "By panorama"
+    }
   },
   "search": {
     "placeholder": "Search skills, MCP servers, slash commands…"

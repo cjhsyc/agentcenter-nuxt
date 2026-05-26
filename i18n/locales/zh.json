@@ -138,7 +138,12 @@
     "skills": "Skill",
     "mcpServers": "MCP",
     "slashCommands": "斜杠命令",
-    "plugins": "插件"
+    "plugins": "插件",
+    "mcp": {
+      "heading": "浏览 MCP",
+      "byTypes": "按类型",
+      "byPanorama": "按全景图"
+    }
   },
   "search": {
     "placeholder": "搜索 Skill、MCP、斜杠命令…"

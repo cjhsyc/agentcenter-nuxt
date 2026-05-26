@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="px-6 py-8 max-w-7xl mx-auto">
-    <div v-if="isMcpCategory" class="mb-3 flex justify-end">
+    <div v-if="isMcpCategory" class="mb-3 flex justify-end md:hidden">
       <NuxtLink
         :to="localePath('/mcp-panorama')"
         class="inline-flex items-center gap-1.5 text-[13px] font-medium text-(--color-accent) hover:gap-2 transition-[gap]"
@@ -87,28 +87,25 @@ onBeforeUnmount(() => {
       </NuxtLink>
     </div>
 
-    <div class="mb-4 flex flex-wrap items-center gap-3">
-      <form
-        role="search"
-        class="relative flex-1 min-w-[240px]"
-        @submit.prevent="flushSearch"
+    <form
+      role="search"
+      class="relative mb-4"
+      @submit.prevent="flushSearch"
+    >
+      <label class="sr-only" for="extensions-search">{{ t("nav.searchLabel") }}</label>
+      <Search
+        :size="16"
+        class="absolute left-3 top-1/2 -translate-y-1/2 text-(--color-ink-muted) pointer-events-none"
+        aria-hidden="true"
+      />
+      <input
+        id="extensions-search"
+        v-model="q"
+        type="search"
+        :placeholder="searchPlaceholder"
+        class="w-full h-9 pl-9 pr-3 rounded-md border border-(--color-border) bg-(--color-bg) text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
       >
-        <label class="sr-only" for="extensions-search">{{ t("nav.searchLabel") }}</label>
-        <Search
-          :size="16"
-          class="absolute left-3 top-1/2 -translate-y-1/2 text-(--color-ink-muted) pointer-events-none"
-          aria-hidden="true"
-        />
-        <input
-          id="extensions-search"
-          v-model="q"
-          type="search"
-          :placeholder="searchPlaceholder"
-          class="w-full h-9 pl-9 pr-3 rounded-md border border-(--color-border) bg-(--color-bg) text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
-        >
-      </form>
-      <SortSelect />
-    </div>
+    </form>
 
     <FilterBar
       :creators="facets.creators"
