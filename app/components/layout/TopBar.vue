@@ -23,11 +23,17 @@ const baseName = computed(() => (route.name?.toString() ?? "").split("___")[0] ?
 
 function hrefFor(key: CategoryKey): RouteLocationRaw {
   if (key === "mcp") return localePath("/mcp")
+  if (key === "skills") return localePath("/skills")
+  if (key === "slash") return localePath("/commands")
+  if (key === "plugins") return localePath("/plugins")
   return { path: localeExtensionsPath.value, query: { category: key } }
 }
 
 function isCategoryActive(key: CategoryKey): boolean {
   if (key === "mcp") return baseName.value === "mcp" || baseName.value === "mcp-panorama"
+  if (key === "skills") return baseName.value === "skills"
+  if (key === "slash") return baseName.value === "commands"
+  if (key === "plugins") return baseName.value === "plugins"
   if (route.path !== localeExtensionsPath.value) return false
   return route.query.category === key
 }
@@ -46,7 +52,7 @@ const moreOpen = ref(false)
     </NuxtLink>
 
     <NuxtLink
-      :to="{ path: localeExtensionsPath, query: { category: 'skills' } }"
+      :to="localePath('/skills')"
       class="md:hidden text-sm text-(--color-ink-muted) hover:text-(--color-ink)"
     >
       {{ t("nav.browse") }}
