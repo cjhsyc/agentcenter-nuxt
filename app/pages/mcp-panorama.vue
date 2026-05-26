@@ -22,6 +22,7 @@ const {
   secondary: activeSecondary,
   status: statusFilter,
   viewMode,
+  setLayer,
   setDrill,
   clearDrill,
   setStatus,
@@ -159,6 +160,7 @@ function filterTo(status: McpStatus) {
       :groups="data.groups"
       @update:status-filter="setStatus"
       @update:view-mode="setView"
+      @update:layer="setLayer"
       @clear-drill="clearDrill"
     />
 
