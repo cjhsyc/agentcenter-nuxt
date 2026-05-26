@@ -7,7 +7,7 @@ import type {
   ToolDto,
 } from "~~/shared/mcp-panorama"
 
-definePageMeta({ layout: "mcp-panorama" })
+definePageMeta({ layout: "browse" })
 
 const { t } = useI18n()
 const head = useLocaleHead()
@@ -22,7 +22,6 @@ const {
   secondary: activeSecondary,
   status: statusFilter,
   viewMode,
-  setLayer,
   setDrill,
   clearDrill,
   setStatus,
@@ -130,11 +129,6 @@ const visibleCounts = computed(() => {
 
 const totals = computed(() => ({ total: data.value?.layerStats.total ?? 0 }))
 
-function setActive(primary: string | null, secondary: string | null) {
-  setDrill(primary, secondary)
-  active.value = null
-}
-
 function pickMcp(payload: { tool: ToolDto; mcp: McpDto }) {
   active.value = payload
 }
@@ -152,26 +146,7 @@ function filterTo(status: McpStatus) {
 </script>
 
 <template>
-  <div class="contents">
-    <!-- Sidebar -->
-    <ClientOnly>
-    <LayerSidebar
-      v-if="data"
-      :layer="layer"
-      :groups="data.groups"
-      :total-count="totals.total"
-      :active-primary="activePrimary"
-      :active-secondary="activeSecondary"
-      @update:layer="setLayer"
-      @set-active="setActive"
-    />
-    <template #fallback>
-      <div class="w-[268px] shrink-0 border-r border-(--color-border) bg-(--color-sidebar)" />
-    </template>
-  </ClientOnly>
-
-  <!-- Main + side panel -->
-  <div class="flex-1 overflow-auto bg-(--color-bg) relative">
+  <div class="px-6 py-8">
     <SectionHeader
       v-if="data"
       :layer="layer"
@@ -187,11 +162,11 @@ function filterTo(status: McpStatus) {
       @clear-drill="clearDrill"
     />
 
-    <div v-if="pending && !data" class="px-7 pb-7 pt-2 text-(--color-ink-muted)">
+    <div v-if="pending && !data" class="pt-2 text-(--color-ink-muted)">
       <div class="h-6 w-40 rounded bg-(--color-border) animate-pulse" />
     </div>
 
-    <div v-if="error" class="px-7 pb-7 pt-2">
+    <div v-if="error" class="pt-2">
       <div class="text-(--color-ink-muted) text-[13px] mb-2">{{ t("mcpPanorama.page.errorLoad") }}</div>
       <button
         type="button"
@@ -221,7 +196,6 @@ function filterTo(status: McpStatus) {
       :active-mcp-id="active?.mcp.id ?? null"
       @pick="pickMcp"
     />
-  </div>
 
     <ToolDetailPanel
       :active="active"
